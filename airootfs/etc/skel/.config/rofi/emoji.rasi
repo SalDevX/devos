@@ -3,4 +3,4 @@ configuration {
     font: "Noto Color Emoji 14"; /* Ensure emoji display properly */
     show-icons: true;
 }
-@theme "/home/craftworkson/.config/rofi/emoji.rasi"
+@theme "~/.local/share/rofi/themes/launchpad.rasi"

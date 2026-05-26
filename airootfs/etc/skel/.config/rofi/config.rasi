@@ -187,4 +187,4 @@ configuration {
 */
 }
 
-@theme "/home/craftworkson/.local/share/rofi/themes/launchpad.rasi"
+@theme "~/.local/share/rofi/themes/launchpad.rasi"
