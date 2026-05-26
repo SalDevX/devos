@@ -65,6 +65,12 @@ bindkey '^R' history-incremental-search-backward
 bindkey '^[[A' history-search-backward   # up arrow: history search
 bindkey '^[[B' history-search-forward    # down arrow: history search
 
+# Word navigation — Ctrl+arrow and Alt/Option+arrow
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;3D' backward-word
+bindkey '^[[1;3C' forward-word
+
 # sudo widget: press ESC ESC to prepend sudo (replaces OMZ sudo plugin)
 _sudo-command-line() {
   [[ -z $BUFFER ]] && zle up-history
