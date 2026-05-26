@@ -41,7 +41,6 @@ broadcom-wl-dkms
 cabextract
 calibre
 cdrtools
-chromium
 chrpath
 cjson
 clamav
@@ -62,7 +61,6 @@ dkms
 dmenu
 dmidecode
 dos2unix
-dosbox
 dosfstools
 dotnet-sdk
 efibootmgr
@@ -77,13 +75,11 @@ ex-vi-compat
 eza
 fail2ban
 fastfetch
-fceux
 fd
 feh
 figlet
 filezilla
 fio
-firefox
 firejail
 flatpak
 foliate
@@ -143,7 +139,6 @@ iperf3
 iptables
 irqbalance
 jalv
-jdk17-openjdk
 jupyter-notebook
 kwallet-pam
 less
@@ -155,7 +150,6 @@ libfdk-aac
 libinput-tools
 liblqr
 libreoffice-still
-libretro-beetle-psx-hw
 libspnav
 libva-intel-driver
 libva-utils
@@ -177,7 +171,6 @@ lxqt-themes
 lxsession
 macchanger
 mako
-mame
 med
 mesa-demos
 mesa-utils
@@ -293,13 +286,11 @@ smartmontools
 solaar
 speedcrunch
 sshfs
-stella
 strace
 streamlink
 stress
 stress-ng
 s-tui
-supertuxkart
 sxhkd
 sxiv
 symengine
