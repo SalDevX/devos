@@ -1,169 +1,283 @@
+<div align="center">
+
+<img src="docs/installer-animation.svg" alt="DevOS Installer" width="900"/>
+
+<br/>
+
 # DevOS
 
-An Arch-based Linux distribution built with `archiso`, cloned from a golden
-developer workstation. **DevOS = XFCE desktop on the LTS kernel**, dev toolchains,
-Apple/MacBook hardware enablement, and hardened defaults.
+**Arch Linux for developers who want everything working on day one.**  
+XFCE desktop · LTS kernel · Calamares GUI installer · Apple MacBook ready.
 
-> The realtime-audio / DAW layer (dwm session, `linux-rt` kernels, JACK/LV2 stack,
-> `daw.target` isolation) is intentionally **not** here — that's the separate
-> **MusicOS** project.
+<br/>
 
-## Repo layout
+[![Arch-based](https://img.shields.io/badge/based%20on-Arch%20Linux-1793d1?logo=archlinux&logoColor=white&style=flat-square)](https://archlinux.org)
+[![Release](https://img.shields.io/badge/release-rolling-1793d1?style=flat-square)](https://github.com/SalDevX/devos/releases)
+[![Kernel](https://img.shields.io/badge/kernel-linux--lts-1a1a2e?logo=linux&logoColor=white&style=flat-square)](https://archlinux.org/packages/core/x86_64/linux-lts/)
+[![Installer](https://img.shields.io/badge/installer-calamares-1793d1?style=flat-square)](https://calamares.io)
+[![MacBook](https://img.shields.io/badge/Apple%20MacBook-ready-28ca41?logo=apple&logoColor=white&style=flat-square)](#apple-macbook-support)
+[![License](https://img.shields.io/badge/license-MIT-555?style=flat-square)](LICENSE)
 
+<br/>
+
+[**Live Installer Preview →**](https://SalDevX.github.io/devos/installer-preview.html)
+&nbsp;&nbsp;·&nbsp;&nbsp;
+[**Build the ISO →**](#build-the-iso)
+&nbsp;&nbsp;·&nbsp;&nbsp;
+[**What's Included →**](#whats-included)
+
+</div>
+
+---
+
+## What is DevOS?
+
+DevOS is a custom Arch Linux distribution assembled from a battle-tested developer workstation. It ships as a **bootable ISO** with a friendly **Calamares GUI installer** — no manual partitioning commands, no `pacstrap`, no post-install configuration marathon.
+
+Boot the ISO. Click through the installer. Reboot into a fully configured XFCE desktop with your browser, editor, container runtime, and dev toolchain already in place.
+
+> The realtime-audio / DAW variant (dwm, `linux-rt`, JACK, LV2 plugins) is the separate **MusicOS** project — DevOS is the developer workstation build.
+
+---
+
+## Desktop
+
+| | |
+|:---|:---|
+| **Window Manager** | XFCE 4 with xfwm4 compositing |
+| **Theme** | WhiteSur-Light GTK · Gruvbox-Plus-Dark icons |
+| **Dock** | Plank (macOS-style bottom dock) |
+| **App Overview** | xfdashboard — 4-finger swipe-up for GNOME-Shell-style overlay |
+| **Terminal** | Alacritty → tmux → zsh with Powerlevel10k |
+| **Login** | TTY autologin → startx → XFCE (no display manager) |
+| **Gestures** | libinput-gestures: 4-finger swipe-up = overview, 3-finger = workspace switch |
+
+---
+
+## What's Included
+
+<details>
+<summary><strong>Browser &amp; Communication</strong></summary>
+
+- **Brave** (stable, `brave-bin`) — tuned flags for Intel GPU compatibility
+- Chromium, Firefox available via pacman/AUR post-install
+
+</details>
+
+<details>
+<summary><strong>Development Tools</strong></summary>
+
+- **VS Code** (`visual-studio-code-bin`)
+- **Docker** + docker-compose (opt-in, see [Docker](#docker))
+- **Node 20** + npm, yarn, GitHub CLI (`gh`), vsce, playwright
+- **Python 3.14** + pip, agate, httpx, opentelemetry stack
+- **Git** + delta pager
+- **Paru** AUR helper
+- **PlatformIO** + udev rules for embedded hardware (Arduino, J-Link, Microchip, EFR)
+
+</details>
+
+<details>
+<summary><strong>System &amp; Utilities</strong></summary>
+
+- `htop`, `btop`, `nvtop`, `iotop` — system monitors
+- `bat`, `eza`, `fd`, `ripgrep`, `fzf`, `zoxide`, `tldr` — modern CLI replacements
+- `ncdu`, `duf` — disk usage
+- `tmux` + Oh-My-Tmux config
+- `mdcat`, `tiv`, `ccze`, `cfonts`, `neofetch` — terminal eye candy
+- `cups`, `cronie`, `acpid`, `tlp`, `bluetooth` — hardware services
+- `ufw` + `fail2ban` — firewall and intrusion protection
+
+</details>
+
+<details>
+<summary><strong>Security Hardening</strong></summary>
+
+- Root account **locked** — access only via `sudo` from the `wheel` group
+- `sudo` drop-in validated with `visudo -cf` at build time
+- **UFW** firewall enabled by default (deny-all inbound)
+- **fail2ban** enabled for SSH and other services
+- **sshd disabled** by default — enable after setting a real password
+- Live ISO password **expired at first login** — forces password change on installed system
+- IPv6 disabled by default via `sysctl.d`
+- `systemd-resolved` with local DNS stub
+
+</details>
+
+---
+
+## Apple MacBook Support
+
+DevOS ships with full Apple MacBook hardware support out of the box. No post-install driver hunting.
+
+| Hardware | Solution | Status |
+|:---|:---|:---:|
+| Broadcom BCM WiFi | `broadcom-wl` DKMS · conflicting drivers blacklisted | ✅ |
+| Intel Iris Pro / HD Graphics | `xf86-video-intel` · TearFree · DRI3 | ✅ |
+| Magic Trackpad 2 | `hid-magicmouse` DKMS · libinput pressure curves | ✅ |
+| Magic Mouse 2 | `hid-magicmouse` DKMS · udev acceleration | ✅ |
+| FaceTime HD Camera | `facetimehd` DKMS | ✅ |
+| Thunderbolt 2 | Native kernel support | ✅ |
+| Fan control | `mbpfan` service | ✅ |
+| Built-in Display Audio | Disabled at boot (prevents HDMI conflicts) | ✅ |
+| USB SuperDrive | udev rule | ✅ |
+| Clamshell / lid | `acpid` handler · logind defer · external display handoff | ✅ |
+| Battery alerts | systemd user timer | ✅ |
+| Suspend / resume | `acpid` + `tlp` | ✅ |
+
+WiFi connects automatically on first boot. The `wl` module loads at boot — open `nmtui` or click the panel applet to choose your network.
+
+---
+
+## System Requirements
+
+| | Minimum | Recommended |
+|:---|:---|:---|
+| **CPU** | x86_64, 2 cores | Intel Core i5+ (Haswell or newer) |
+| **RAM** | 2 GB | 8 GB+ |
+| **Storage** | 20 GB | 60 GB+ SSD |
+| **Firmware** | UEFI | UEFI (systemd-boot) |
+| **Network** | Ethernet or Broadcom/Intel WiFi | — |
+
+---
+
+## Installation
+
+### Option A — GUI (Calamares)
+
+1. Write the ISO to a USB drive:
+   ```bash
+   sudo dd if=devos-*.iso of=/dev/sdX bs=4M status=progress oflag=sync
+   ```
+2. Boot the USB on your target machine
+3. Connect to WiFi via the panel applet (Broadcom loads automatically)
+4. Double-click **"Install DevOS"** on the desktop
+5. Follow the steps: Location → Keyboard → Partitions → Users → Install → Reboot
+
+The installer erases the selected disk and configures `systemd-boot` with a GPT layout: 512 MiB ESP + ext4 root.
+
+### Option B — CLI (install.sh)
+
+For headless or scripted installs:
+
+```bash
+# 1. Partition and format
+cfdisk /dev/sdX              # GPT: sdX1 = 512 MiB EFI, sdX2 = rest Linux
+mkfs.fat -F32 /dev/sdX1
+mkfs.ext4     /dev/sdX2
+
+# 2. Mount
+mount          /dev/sdX2 /mnt
+mount --mkdir  /dev/sdX1 /mnt/boot
+
+# 3. Run installer
+sudo bash /opt/devos/installer/install.sh
 ```
-devos/
-├── profiledef.sh            # archiso ISO metadata + file permissions
-├── pacman.conf              # build-time repos (+ optional [devos-local] for AUR)
-├── packages.x86_64          # 467 repo packages (RT kernels + 78 DAW pkgs → MusicOS)
-├── aur-build-list.txt       # 126 AUR build targets (priority-ordered)
-├── airootfs/                # overlay applied to the live/installed root
-│   ├── etc/
-│   │   ├── os-release hostname locale.conf vconsole.conf environment
-│   │   ├── modprobe.d/ sysctl.d/ udev/rules.d/ modules-load.d/
-│   │   ├── X11/xorg.conf.d/  # keyboard, intel TearFree, libinput, magic-mouse
-│   │   ├── acpi/             # CLAMSHELL: events/ + actions/lid.handler.sh + handler.sh
-│   │   ├── systemd/system/   # disable-apple-display-audio, disable-usb-autosuspend, disable-wakeup
-│   │   ├── systemd/logind.conf.d/  # 10-devos-lid.conf — HandleLidSwitch=ignore (acpid owns lid)
-│   │   └── skel/             # the scrubbed, publishable dotfiles (see below)
-│   └── root/customize_airootfs.sh   # build-time setup (user, services, autologin)
-├── installer/
-│   ├── etc/mkinitcpio.conf
-│   ├── loader/{loader.conf,entries/devos.conf,entries/devos-fallback.conf}
-│   └── install.sh           # guided disk install (systemd-boot, PARTUUID auto-detected)
-├── tools/scrub.sh           # personal-data scrubber (idempotent)
-├── tools/build-aur-repo.sh  # makepkg loop → local pacman repo (devos-local)
-└── docs/
+
+`install.sh` runs `pacstrap`, generates `fstab`, applies the system overlay, installs `systemd-boot`, and auto-fills the root PARTUUID — no manual loader entry editing.
+
+---
+
+## First Login
+
+| | |
+|:---|:---|
+| **Username** | `user` |
+| **Password** | `user` (expired — you will be prompted to change it immediately) |
+| **Root** | Locked — use `sudo` |
+
+`startx` launches automatically on tty1; XFCE starts.
+
+```bash
+# Suggested first steps
+passwd                              # set your real password
+sudo pacman -Syu                    # sync and upgrade all packages
+paru -S <aur-package>               # install AUR packages with paru
+sudo systemctl enable --now sshd    # enable SSH (only after setting a real password)
 ```
+
+---
+
+## Docker
+
+Docker is opt-in and not pre-enabled:
+
+```bash
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER"     # log out and back in to apply group
+```
+
+---
 
 ## Build the ISO
 
+Build from source on any Arch Linux system:
+
 ```bash
-sudo pacman -S archiso
+sudo pacman -S archiso git
+git clone https://github.com/SalDevX/devos
 cd devos
 sudo mkarchiso -v -w /tmp/devos-work -o ./out .
 ```
 
-### AUR packages (one-time, before building)
-`packages.x86_64` is **repo-only**. The **126** AUR/foreign packages for DevOS are in
-`aur-build-list.txt` (priority-ordered: `brave-bin`, `xfdashboard`, `libinput-gestures`,
-`ttf-ms-fonts`, shell/term tools, …). Build them into a local repo with the included
-script, then uncomment `[devos-local]` in `pacman.conf`:
+### Including AUR packages
+
+`packages.x86_64` is official-repo only. For a full build with Brave, Calamares, xfdashboard, and 112 other AUR packages, pre-build a local repo:
 
 ```bash
-./tools/build-aur-repo.sh ~/devos-local        # makepkg loop over aur-build-list.txt
-cat ~/devos-local/devos-aur-built.txt >> packages.x86_64
+./tools/build-aur-repo.sh ~/devos-local    # builds all 115 AUR packages
+# Uncomment [devos-local] in pacman.conf, then re-run mkarchiso
 ```
 
-> Browser: ship **Brave stable** (`brave-bin`), not nightly. Its tuned flags are in
-> `airootfs/etc/skel/.config/brave-flags.conf` (Haswell GPU workarounds); on stable the
-> config dir is `~/.config/BraveSoftware/Brave-Browser` (not `…-Beta`).
+---
 
-### Package caveats
-- RT kernels removed (MusicOS). DevOS ships `linux-lts`.
-- The 78 DAW/LV2 packages were **split out to a separate MusicOS repo** (repo + AUR lists);
-  `packages.x86_64` is now 467 dev-focused packages.
-- Validate every name resolves: any unavailable package will stop `pacstrap`/`mkarchiso`.
+## Repo Layout
 
-## Install to disk
-
-### 1 — Connect to WiFi (skip if using ethernet)
-
-The `wl` module (Broadcom BCM) loads automatically on boot. Connect before running
-the installer — `pacstrap` needs internet:
-
-```bash
-nmtui        # TUI: pick your network, enter password, Activate
-# or
-nmcli device wifi connect "SSID" password "passphrase"
+```
+devos/
+├── profiledef.sh              archiso ISO metadata
+├── packages.x86_64            470 official-repo packages
+├── aur-build-list.txt         115 AUR packages (priority-ordered)
+├── pacman.conf                build repos (+ optional [devos-local])
+├── airootfs/
+│   ├── etc/
+│   │   ├── calamares/         GUI installer config, branding, scripts
+│   │   ├── skel/              Default user dotfiles (zsh, alacritty, xfce4)
+│   │   ├── modprobe.d/        Broadcom wl + conflicting driver blacklist
+│   │   ├── systemd/system/    Apple hardware services, firstboot, autologin
+│   │   └── X11/xorg.conf.d/   Intel TearFree, libinput, Magic Mouse
+│   └── root/customize_airootfs.sh   Build-time setup
+├── installer/install.sh       CLI installer (auto-detects PARTUUID)
+├── tools/
+│   ├── build-aur-repo.sh      makepkg loop → local pacman repo
+│   └── scrub.sh               Personal-data scrubber (idempotent)
+└── docs/                      GitHub Pages: live installer preview
 ```
 
-Verify: `ping -c1 archlinux.org`
+---
 
-### 2 — Partition the disk
+## Contributing
 
-```bash
-lsblk                        # identify target (e.g. /dev/sda, /dev/nvme0n1)
-cfdisk /dev/sdX              # GPT → new partition table
-                             #   /dev/sdX1  512M   EFI System
-                             #   /dev/sdX2  rest   Linux filesystem
-                             # Write → Quit
-```
+Issues and pull requests welcome for:
 
-### 3 — Format
+- Build failures or archiso compatibility breaks
+- Hardware support improvements
+- Package additions (open an issue with rationale — each package adds build time)
+- Calamares installer UX improvements
 
-```bash
-mkfs.fat -F32 /dev/sdX1
-mkfs.ext4     /dev/sdX2
-```
+For general Arch Linux questions, the [Arch Wiki](https://wiki.archlinux.org) is the definitive reference.
 
-### 4 — Mount
-
-```bash
-mount          /dev/sdX2 /mnt
-mount --mkdir  /dev/sdX1 /mnt/boot
-```
-
-### 5 — Run the installer
-
-```bash
-sudo ./installer/install.sh
-```
-
-It runs `pacstrap`, `genfstab`, copies the `airootfs/etc` overlay + skel, installs
-**systemd-boot**, and writes loader entries with the **root PARTUUID auto-detected**
-from `/mnt` (replacing the `YOUR-PARTUUID-HERE` placeholder). Default credentials are
-`user/user` and `root/root` — change them immediately.
-
-## Login model
-No display manager, no greeter. `getty` autologins `user` on **tty1**, whose
-`.zprofile` runs `startx` → `.xinitrc` → **XFCE**. Disable autologin by removing
-`/etc/systemd/system/getty@tty1.service.d/autologin.conf`.
-
-## Clamshell / display switching (custom acpid logic)
-`logind`'s `HandleLidSwitch` is disabled (`logind.conf.d/10-devos-lid.conf`); acpid
-owns the lid via `airootfs/etc/acpi/actions/lid.handler.sh`: lid-closed + external →
-internal panel `--off` + external primary; lid-closed + no external → `suspend`;
-lid-open → restore dual/internal + relaunch xfdashboard. Output names `eDP1`/`DP2`
-are **hardware-specific** — see docs/BLUEPRINT.md §5.5.
-
-## Privacy / scrub
-`tools/scrub.sh` already ran on `airootfs/etc/skel`. It removed:
-- the source user's `/home/<user>` paths and bare username → `/home/user` / `user`
-- XFCE panel systray memory incl. **saved Wi-Fi SSIDs**, recent-apps, favorites
-- weather location (coords/name/timezone) and panel background-image path
-- author name from a config comment
-
-**Excluded entirely** (never captured/committed): `~/.zshenv.secret`, the Brave
-profile, GPG/SSH keys. Re-run after dropping fresh configs in:
-`tools/scrub.sh airootfs/etc/skel <old-user>`.
-
-## Hardware notes (source was an Apple MacBook, Intel Haswell)
-Kept because they're harmless elsewhere and guarded, but **remove for generic x86**:
-`modprobe.d` (i915 PSR/FBC, magicmouse, usb-autosuspend), `udev/rules.d`
-(apple-display-audio, magic-mouse, apple-superdrive), `xorg.conf.d/50-magicmouse.conf`,
-the two `disable-apple-*` services, and `intel-ucode`/`i965` assumptions. Dev/embedded
-udev rules (J-Link, PlatformIO, Microchip) are kept on purpose.
-
-## Still manual (see docs/BLUEPRINT.md §6)
-- Build/validate the AUR local repo (`tools/build-aur-repo.sh`).
-- Confirm the systemd-boot kernel cmdline on the target (`sudo bootctl status`); the
-  placeholder root PARTUUID is auto-filled by `install.sh`.
-- `nvim` config is a separate git repo — clone it into the skel or document it.
-
-## Docker (opt-in)
-Docker is **not** enabled by default and the `docker` group is **not** pre-created —
-running the daemon and granting socket access is a privilege decision each user makes.
-To opt in:
-
-```bash
-sudo pacman -S --needed docker        # already present if kept in packages.x86_64
-sudo systemctl enable --now docker
-sudo usermod -aG docker "$USER"       # log out/in for the group to apply
-```
+---
 
 ## License
-- **Repo scripts & configs** (`profiledef.sh`, `tools/`, `installer/`, `airootfs/` overlays,
-  and the dotfiles in `airootfs/etc/skel`) — **MIT**, see `LICENSE`.
-- **Bundled software** pulled via `packages.x86_64` / `aur-build-list.txt` is **not** covered
-  by that grant; each package keeps its upstream license. The base system and much of the
-  toolchain are **GPL-3.0** (plus other OSI licenses). DevOS only assembles and configures them.
+
+- **Scripts, configs, and dotfiles** in this repo — [MIT](LICENSE)
+- **Packages** installed via `packages.x86_64` and `aur-build-list.txt` retain their upstream licenses. The base system is predominantly GPL-3.0.
+
+---
+
+<div align="center">
+
+[Installer Preview](https://SalDevX.github.io/devos/installer-preview.html) &nbsp;·&nbsp; [Arch Wiki](https://wiki.archlinux.org) &nbsp;·&nbsp; [Calamares](https://calamares.io) &nbsp;·&nbsp; [archiso docs](https://wiki.archlinux.org/title/Archiso)
+
+</div>
