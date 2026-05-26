@@ -55,7 +55,6 @@ dconf-editor
 devilspie
 dialog
 direnv
-discover
 dkms
 dmenu
 dmidecode
@@ -260,7 +259,6 @@ qt5-script
 qt5-serialport
 qt5-speech
 qt5-x11extras
-qtcreator
 rclone
 redshift
 reflector
