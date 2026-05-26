@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>DevOS Installer — Preview</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #2c2c2c;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 32px;
+  }
+
+  /* ── Window chrome ── */
+  .window {
+    width: 900px; height: 580px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+  }
+  .titlebar {
+    background: #1a1a1a;
+    height: 36px; flex-shrink: 0;
+    display: flex; align-items: center; padding: 0 14px; gap: 8px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+  .titlebar-label {
+    flex: 1; text-align: center;
+    font-size: 12px; color: #6b7280; letter-spacing: 0.4px;
+  }
+
+  /* ── Layout ── */
+  .body { flex: 1; display: flex; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 200px; flex-shrink: 0;
+    background: #1a1a1a;
+    display: flex; flex-direction: column;
+    padding: 28px 0 20px;
+  }
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 20px 28px;
+    border-bottom: 1px solid #222222;
+  }
+  .mark {
+    width: 36px; height: 36px; flex-shrink: 0;
+  }
+  .mark svg { display: block; }
+  .sidebar-name {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.5px; line-height: 1;
+    color: #f0f0f0;
+  }
+  .sidebar-name span { color: #1793d1; }
+  .steps { flex: 1; padding: 16px 0; }
+  .step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 20px; cursor: pointer;
+    font-size: 13px; color: #6b7280;
+    position: relative; transition: color 0.15s;
+  }
+  .step.done { color: #9ca3af; }
+  .step.active {
+    color: #1793d1; background: rgba(23,147,209,0.08);
+  }
+  .step.active::before {
+    content: "";
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: #1793d1;
+    border-radius: 0 2px 2px 0;
+  }
+  .step-num {
+    font-size: 10px; font-family: monospace;
+    letter-spacing: 0.5px; width: 20px; text-align: right;
+    flex-shrink: 0;
+  }
+  .step-check {
+    font-size: 10px; width: 20px; text-align: center;
+    flex-shrink: 0; color: #5a8a5a;
+  }
+  .sidebar-ver {
+    padding: 12px 20px 0;
+    font-size: 10px; color: #444444; font-family: monospace;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    border-top: 1px solid #222222;
+  }
+
+  /* ── Content ── */
+  .content {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .page { flex: 1; overflow-y: auto; padding: 36px 40px 20px; display: none; }
+  .page.active { display: block; }
+
+  .page-title {
+    font-size: 22px; font-weight: 600;
+    color: #111111; letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 13px; color: #6b7280; margin-bottom: 28px;
+  }
+
+  /* Bottom bar */
+  .bottombar {
+    height: 56px; flex-shrink: 0;
+    background: #f8f8f8;
+    border-top: 1px solid #e5e7eb;
+    display: flex; align-items: center;
+    justify-content: flex-end; gap: 10px;
+    padding: 0 28px;
+  }
+  .btn {
+    padding: 8px 22px; border-radius: 5px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: none; letter-spacing: 0.1px;
+    transition: background 0.1s;
+  }
+  .btn-secondary {
+    background: #e5e7eb; color: #444444;
+  }
+  .btn-secondary:hover { background: #d1d5db; }
+  .btn-primary {
+    background: #111111; color: #fff;
+  }
+  .btn-primary:hover { background: #333333; }
+  .btn-accent {
+    background: #1793d1; color: #fff;
+  }
+  .btn-accent:hover { background: #0f6aad; }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* ── Welcome page ── */
+  .welcome-hero {
+    display: flex; align-items: center; gap: 24px;
+    padding: 20px 0 32px;
+  }
+  .welcome-mark svg { display: block; }
+  .welcome-text h2 {
+    font-size: 32px; font-weight: 700; color: #111111;
+    letter-spacing: -1px; margin-bottom: 6px;
+  }
+  .welcome-text h2 span { color: #1793d1; }
+  .welcome-text p { font-size: 14px; color: #6b7280; max-width: 36ch; line-height: 1.6; }
+  .req-list { display: flex; flex-direction: column; gap: 8px; }
+  .req { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+  .req-icon { width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0; }
+  .req-ok { background: #e8f4fc; color: #1793d1; }
+  .req-label { color: #111111; }
+  .req-val { color: #6b7280; font-size: 12px; margin-left: auto; font-family: monospace; }
+
+  /* ── Locale page ── */
+  .map-placeholder {
+    width: 100%; height: 200px; background: #f0f0f0;
+    border: 1px solid #e5e7eb; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px; position: relative; overflow: hidden;
+  }
+  .map-placeholder svg { opacity: 0.25; }
+  .map-dot {
+    position: absolute; width: 10px; height: 10px;
+    border-radius: 50%; background: #1793d1;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #1793d1;
+    top: 45%; left: 52%;
+  }
+  .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .form-group { flex: 1; }
+  .form-label {
+    font-size: 11px; font-weight: 600; color: #6b7280;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    margin-bottom: 6px; display: block;
+  }
+  .form-select, .form-input {
+    width: 100%; padding: 8px 12px;
+    border: 1px solid #e5e7eb; border-radius: 4px;
+    font-size: 13px; color: #111111; background: #fff;
+    appearance: none; outline: none;
+  }
+  .form-select:focus, .form-input:focus {
+    border-color: #1793d1; box-shadow: 0 0 0 2px rgba(23,147,209,0.15);
+  }
+
+  /* ── Keyboard page ── */
+  .keyboard-layout {
+    background: #f8f8f8; border: 1px solid #e5e7eb;
+    border-radius: 4px; padding: 16px; margin-bottom: 20px;
+    font-family: monospace; font-size: 12px; color: #6b7280;
+    line-height: 2;
+  }
+  .kb-row { display: flex; gap: 4px; margin-bottom: 4px; }
+  .key {
+    min-width: 26px; height: 26px; background: #fff;
+    border: 1px solid #d1d5db; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #111111; padding: 0 4px;
+    box-shadow: 0 1px 0 #c1c7cf;
+  }
+  .key.wide { min-width: 48px; }
+  .key.wider { min-width: 72px; }
+  .test-input {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid #e5e7eb; border-radius: 4px;
+    font-size: 14px; background: #ffffff;
+  }
+  .test-hint { font-size: 12px; color: #9ca3af; margin-top: 6px; }
+
+  /* ── Partition page ── */
+  .disk-card {
+    border: 2px solid #e5e7eb; border-radius: 6px;
+    padding: 16px 20px; margin-bottom: 14px;
+    cursor: pointer; transition: border-color 0.15s;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .disk-card.selected { border-color: #1793d1; background: #e8f4fc; }
+  .disk-icon { font-size: 28px; }
+  .disk-info { flex: 1; }
+  .disk-name { font-size: 14px; font-weight: 600; color: #111111; }
+  .disk-detail { font-size: 12px; color: #6b7280; font-family: monospace; margin-top: 2px; }
+  .disk-size { font-size: 20px; font-weight: 700; color: #1793d1; }
+  .disk-bar { margin-top: 10px; }
+  .disk-bar-track {
+    height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;
+  }
+  .disk-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #111111 0%, #444444 100%);
+  }
+  .disk-bar-labels {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: #9ca3af; font-family: monospace;
+    margin-top: 4px;
+  }
+  .option-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .option-btn {
+    flex: 1; padding: 12px; border: 2px solid #e5e7eb;
+    border-radius: 6px; cursor: pointer; text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+  }
+  .option-btn.selected { border-color: #1793d1; background: #e8f4fc; }
+  .option-btn-title { font-size: 13px; font-weight: 600; color: #111111; }
+  .option-btn-desc { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
+  /* ── Users page ── */
+  .avatar-row {
+    display: flex; align-items: center; gap: 20px; margin-bottom: 24px;
+  }
+  .avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #1a1a1a; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .avatar-hint { font-size: 12px; color: #6b7280; line-height: 1.5; }
+  .pw-strength { height: 4px; border-radius: 2px; margin-top: 6px; }
+  .pw-strength.good { background: linear-gradient(90deg, #5a8a5a 60%, #e5e7eb 60%); }
+  .checkbox-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 13px; color: #444444; }
+  input[type=checkbox] { width: 16px; height: 16px; accent-color: #1793d1; }
+
+  /* ── Summary page ── */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .summary-card {
+    border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 16px;
+  }
+  .summary-card-title {
+    font-size: 10px; font-weight: 700; color: #9ca3af;
+    letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 13px; padding: 3px 0;
+  }
+  .summary-key { color: #6b7280; }
+  .summary-val { color: #111111; font-weight: 500; }
+  .summary-warning {
+    background: #e8f4fc; border: 1px solid #7ec8e3;
+    border-radius: 6px; padding: 12px 16px;
+    font-size: 13px; color: #0a4a7a;
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-top: 16px;
+  }
+
+  /* ── Installing page ── */
+  .install-hero {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%; text-align: center;
+    padding: 0;
+  }
+  .slideshow {
+    width: 100%; height: 240px;
+    background: #111111; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; margin-bottom: 28px;
+  }
+  .slideshow-title { font-size: 22px; font-weight: 700; color: #f0f0f0; }
+  .slideshow-sub { font-size: 14px; color: #6b7280; }
+  .progress-wrap { width: 100%; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: #6b7280; font-family: monospace;
+    margin-bottom: 8px;
+  }
+  .progress-track {
+    height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: #1793d1; border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Finished page ── */
+  .finish-hero {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding-top: 20px;
+  }
+  .finish-check {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: #e8f4fc; display: flex; align-items: center;
+    justify-content: center; margin-bottom: 20px;
+    font-size: 32px;
+  }
+  .finish-title {
+    font-size: 26px; font-weight: 700; color: #111111;
+    letter-spacing: -0.5px; margin-bottom: 8px;
+  }
+  .finish-sub { font-size: 14px; color: #6b7280; max-width: 40ch; line-height: 1.6; margin-bottom: 28px; }
+  .finish-note {
+    background: #f8f8f8; border: 1px solid #e5e7eb;
+    border-radius: 6px; padding: 12px 20px;
+    font-size: 12px; font-family: monospace; color: #6b7280;
+  }
+
+  /* ── Nav dots ── */
+  .nav-dots {
+    display: flex; gap: 6px; margin-right: auto; padding-left: 28px;
+  }
+  .nav-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #d1d5db; cursor: pointer; transition: background 0.15s;
+  }
+  .nav-dot.active { background: #1793d1; width: 18px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="dot r"></div>
+    <div class="dot y"></div>
+    <div class="dot g"></div>
+    <div class="titlebar-label">Install DevOS</div>
+  </div>
+
+  <div class="body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="mark">
+          <svg width="36" height="36" viewBox="0 0 100 100">
+            <path d="M0 0 H86 L100 14 V100 H0 Z" fill="#f0f0f0"/>
+            <text x="50" y="68" text-anchor="middle"
+              font-family="system-ui,sans-serif" font-weight="700" font-size="52"
+              letter-spacing="-2" fill="#1a1a1a">do</text>
+          </svg>
+        </div>
+        <div class="sidebar-name">Dev<span>OS</span></div>
+      </div>
+
+      <div class="steps" id="steps">
+        <div class="step done" data-page="0">
+          <span class="step-check">✓</span>
+          <span>Welcome</span>
+        </div>
+        <div class="step active" data-page="1">
+          <span class="step-num">02</span>
+          <span>Location</span>
+        </div>
+        <div class="step" data-page="2">
+          <span class="step-num">03</span>
+          <span>Keyboard</span>
+        </div>
+        <div class="step" data-page="3">
+          <span class="step-num">04</span>
+          <span>Disk</span>
+        </div>
+        <div class="step" data-page="4">
+          <span class="step-num">05</span>
+          <span>Users</span>
+        </div>
+        <div class="step" data-page="5">
+          <span class="step-num">06</span>
+          <span>Summary</span>
+        </div>
+        <div class="step" data-page="6">
+          <span class="step-num">07</span>
+          <span>Install</span>
+        </div>
+        <div class="step" data-page="7">
+          <span class="step-num">08</span>
+          <span>Finish</span>
+        </div>
+      </div>
+
+      <div class="sidebar-ver">devos · rolling · 2026</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- PAGE 0: Welcome -->
+      <div class="page" id="page-0">
+        <div class="welcome-hero">
+          <div class="welcome-mark">
+            <svg width="80" height="80" viewBox="0 0 100 100">
+              <path d="M0 0 H86 L100 14 V100 H0 Z" fill="#111111"/>
+              <text x="50" y="68" text-anchor="middle"
+                font-family="system-ui,sans-serif" font-weight="700" font-size="52"
+                letter-spacing="-2" fill="#fff">do</text>
+            </svg>
+          </div>
+          <div class="welcome-text">
+            <h2>Dev<span>OS</span></h2>
+            <p>An Arch-based developer workstation. LTS kernel, XFCE, and a full toolchain — ready to install.</p>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;">System requirements</div>
+        <div class="req-list">
+          <div class="req">
+            <div class="req-icon req-ok">✓</div>
+            <span class="req-label">Storage</span>
+            <span class="req-val">476 GB available</span>
+          </div>
+          <div class="req">
+            <div class="req-icon req-ok">✓</div>
+            <span class="req-label">Memory</span>
+            <span class="req-val">16 GB RAM</span>
+          </div>
+          <div class="req">
+            <div class="req-icon req-ok">✓</div>
+            <span class="req-label">Internet</span>
+            <span class="req-val">Connected</span>
+          </div>
+          <div class="req">
+            <div class="req-icon req-ok">✓</div>
+            <span class="req-label">Power</span>
+            <span class="req-val">AC adapter detected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 1: Locale -->
+      <div class="page active" id="page-1">
+        <div class="page-title">Where are you?</div>
+        <div class="page-sub">Set your timezone and language.</div>
+        <div class="map-placeholder">
+          <svg width="100%" height="100%" viewBox="0 0 800 200">
+            <rect width="800" height="200" fill="#f0f0f0"/>
+            <text x="400" y="110" text-anchor="middle" font-size="14" fill="#9ca3af" font-family="monospace">world map</text>
+          </svg>
+          <div class="map-dot"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Region</label>
+            <select class="form-select">
+              <option>America</option>
+              <option>Europe</option>
+              <option>Asia</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Zone</label>
+            <select class="form-select">
+              <option>New_York</option>
+              <option>Los_Angeles</option>
+              <option>Chicago</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <select class="form-select">
+              <option>English (US)</option>
+              <option>English (UK)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: Keyboard -->
+      <div class="page" id="page-2">
+        <div class="page-title">Keyboard layout</div>
+        <div class="page-sub">Select how your keyboard is configured.</div>
+        <div class="form-row" style="margin-bottom:20px">
+          <div class="form-group">
+            <label class="form-label">Model</label>
+            <select class="form-select"><option>Apple — MacBook Pro</option><option>Generic 105-key</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Layout</label>
+            <select class="form-select"><option>English (US)</option><option>Italian</option><option>German</option></select>
+          </div>
+        </div>
+        <div class="keyboard-layout">
+          <div class="kb-row">
+            <div class="key">`</div><div class="key">1</div><div class="key">2</div>
+            <div class="key">3</div><div class="key">4</div><div class="key">5</div>
+            <div class="key">6</div><div class="key">7</div><div class="key">8</div>
+            <div class="key">9</div><div class="key">0</div><div class="key">-</div>
+            <div class="key">=</div><div class="key wide">⌫</div>
+          </div>
+          <div class="kb-row">
+            <div class="key wide">Tab</div><div class="key">Q</div><div class="key">W</div>
+            <div class="key">E</div><div class="key">R</div><div class="key">T</div>
+            <div class="key">Y</div><div class="key">U</div><div class="key">I</div>
+            <div class="key">O</div><div class="key">P</div><div class="key">[</div>
+            <div class="key">]</div><div class="key">\ </div>
+          </div>
+          <div class="kb-row">
+            <div class="key wider">Caps</div><div class="key">A</div><div class="key">S</div>
+            <div class="key">D</div><div class="key">F</div><div class="key">G</div>
+            <div class="key">H</div><div class="key">J</div><div class="key">K</div>
+            <div class="key">L</div><div class="key">;</div><div class="key">'</div>
+            <div class="key wider">Enter</div>
+          </div>
+        </div>
+        <input class="test-input" placeholder="Type here to test your keyboard…" />
+        <div class="test-hint">Type a few characters to verify the layout is correct.</div>
+      </div>
+
+      <!-- PAGE 3: Disk -->
+      <div class="page" id="page-3">
+        <div class="page-title">Where to install?</div>
+        <div class="page-sub">Select a disk and installation method.</div>
+
+        <div class="option-row">
+          <div class="option-btn selected" onclick="this.parentElement.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+            <div class="option-btn-title">Erase disk</div>
+            <div class="option-btn-desc">Recommended — wipes the disk and installs DevOS</div>
+          </div>
+          <div class="option-btn" onclick="this.parentElement.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+            <div class="option-btn-title">Manual partition</div>
+            <div class="option-btn-desc">Advanced — create partitions yourself</div>
+          </div>
+        </div>
+
+        <div class="disk-card selected">
+          <div class="disk-icon">💾</div>
+          <div class="disk-info">
+            <div class="disk-name">Apple SSD AP0512</div>
+            <div class="disk-detail">/dev/nvme0n1 · GPT · NVMe</div>
+            <div class="disk-bar">
+              <div class="disk-bar-track">
+                <div class="disk-bar-fill" style="width:14%"></div>
+              </div>
+              <div class="disk-bar-labels"><span>68 GB used</span><span>512 GB total</span></div>
+            </div>
+          </div>
+          <div class="disk-size">512 GB</div>
+        </div>
+
+        <div style="font-size:12px;color:#9ca3af;background:#f8f8f8;border:1px solid #e5e7eb;border-radius:4px;padding:10px 14px;font-family:monospace;">
+          Will create: /dev/nvme0n1p1 (512 MiB EFI) + /dev/nvme0n1p2 (ext4 root)
+        </div>
+      </div>
+
+      <!-- PAGE 4: Users -->
+      <div class="page" id="page-4">
+        <div class="page-title">Who are you?</div>
+        <div class="page-sub">Create your account on DevOS.</div>
+        <div class="avatar-row">
+          <div class="avatar">
+            <svg width="36" height="36" viewBox="0 0 100 100">
+              <path d="M0 0 H86 L100 14 V100 H0 Z" fill="#f0f0f0"/>
+              <text x="50" y="68" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="52" letter-spacing="-2" fill="#1a1a1a">do</text>
+            </svg>
+          </div>
+          <div class="avatar-hint">Your account will be in the <strong>wheel</strong> group with sudo access.<br/>Shell: <code>zsh</code></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full name</label>
+            <input class="form-input" value="Dev User" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" value="user" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Hostname</label>
+            <input class="form-input" value="devos" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input class="form-input" type="password" value="••••••••" />
+            <div class="pw-strength good"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm password</label>
+            <input class="form-input" type="password" value="••••••••" />
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="autologin" />
+          <label for="autologin">Log in automatically without password</label>
+        </div>
+      </div>
+
+      <!-- PAGE 5: Summary -->
+      <div class="page" id="page-5">
+        <div class="page-title">Ready to install</div>
+        <div class="page-sub">Review your choices before anything is written to disk.</div>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card-title">System</div>
+            <div class="summary-row"><span class="summary-key">OS</span><span class="summary-val">DevOS (Rolling)</span></div>
+            <div class="summary-row"><span class="summary-key">Kernel</span><span class="summary-val">linux-lts</span></div>
+            <div class="summary-row"><span class="summary-key">Desktop</span><span class="summary-val">XFCE</span></div>
+            <div class="summary-row"><span class="summary-key">Shell</span><span class="summary-val">zsh</span></div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-title">Locale</div>
+            <div class="summary-row"><span class="summary-key">Language</span><span class="summary-val">English (US)</span></div>
+            <div class="summary-row"><span class="summary-key">Timezone</span><span class="summary-val">America/New_York</span></div>
+            <div class="summary-row"><span class="summary-key">Keyboard</span><span class="summary-val">us</span></div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-title">Disk</div>
+            <div class="summary-row"><span class="summary-key">Device</span><span class="summary-val">/dev/nvme0n1</span></div>
+            <div class="summary-row"><span class="summary-key">Method</span><span class="summary-val">Erase + format</span></div>
+            <div class="summary-row"><span class="summary-key">Filesystem</span><span class="summary-val">ext4</span></div>
+            <div class="summary-row"><span class="summary-key">Bootloader</span><span class="summary-val">systemd-boot</span></div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-title">User</div>
+            <div class="summary-row"><span class="summary-key">Full name</span><span class="summary-val">Dev User</span></div>
+            <div class="summary-row"><span class="summary-key">Username</span><span class="summary-val">user</span></div>
+            <div class="summary-row"><span class="summary-key">Hostname</span><span class="summary-val">devos</span></div>
+            <div class="summary-row"><span class="summary-key">Groups</span><span class="summary-val">wheel, audio, video</span></div>
+          </div>
+        </div>
+        <div class="summary-warning">
+          <span>⚠</span>
+          <span>This will <strong>erase all data</strong> on /dev/nvme0n1. This cannot be undone.</span>
+        </div>
+      </div>
+
+      <!-- PAGE 6: Installing -->
+      <div class="page" id="page-6">
+        <div class="slideshow">
+          <svg width="48" height="48" viewBox="0 0 100 100">
+            <path d="M0 0 H86 L100 14 V100 H0 Z" fill="#f0f0f0"/>
+            <text x="50" y="68" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="52" letter-spacing="-2" fill="#1a1a1a">do</text>
+          </svg>
+          <div class="slideshow-title" id="slide-title">Installing DevOS…</div>
+          <div class="slideshow-sub" id="slide-sub">Setting up your developer workstation</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="progress-step">Running pacstrap…</span>
+            <span id="progress-pct">34%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-bar" style="width:34%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 7: Finished -->
+      <div class="page" id="page-7">
+        <div class="finish-hero">
+          <div class="finish-check">✓</div>
+          <div class="finish-title">DevOS is installed.</div>
+          <div class="finish-sub">Remove the USB drive and reboot to start using your new system.</div>
+          <div class="finish-note">
+            user@devos — default shell: zsh · sudo enabled · WM: XFCE
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="bottombar">
+        <div class="nav-dots" id="nav-dots"></div>
+        <button class="btn btn-secondary" id="btn-back" onclick="navigate(-1)">← Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PAGES = 8;
+let current = 1;
+
+const slides = [
+  { title: "Installing DevOS…",   sub: "Setting up your developer workstation" },
+  { title: "Built for developers", sub: "XFCE desktop · LTS kernel · Brave · full dev toolchain" },
+  { title: "Apple MacBook ready",  sub: "Broadcom WiFi · clamshell switching · Magic Trackpad" },
+  { title: "Almost there…",        sub: "Configuring services and dotfiles" },
+];
+const progressSteps = [
+  [5,  "Partitioning disk…"],
+  [12, "Formatting partitions…"],
+  [18, "Mounting filesystems…"],
+  [34, "Running pacstrap…"],
+  [62, "Installing packages…"],
+  [75, "Generating fstab…"],
+  [80, "Configuring locale…"],
+  [85, "Creating user account…"],
+  [89, "Enabling services…"],
+  [93, "Installing systemd-boot…"],
+  [97, "Generating initramfs…"],
+  [100,"Installation complete!"],
+];
+let progressIdx = 3;
+let slideIdx = 0;
+let installTimer = null;
+
+function buildDots() {
+  const el = document.getElementById("nav-dots");
+  el.innerHTML = "";
+  for (let i = 0; i < PAGES; i++) {
+    const d = document.createElement("div");
+    d.className = "nav-dot" + (i === current ? " active" : "");
+    d.onclick = () => goTo(i);
+    el.appendChild(d);
+  }
+}
+
+function updateSidebar() {
+  document.querySelectorAll(".step").forEach((s, i) => {
+    s.classList.remove("active", "done");
+    const p = parseInt(s.dataset.page);
+    if (p < current) s.classList.add("done"), s.querySelector("span:first-child").textContent = "✓";
+    else if (p === current) s.classList.add("active");
+    else s.querySelector("span:first-child").textContent = String(p + 1).padStart(2, "0");
+  });
+}
+
+function updateButtons() {
+  const back = document.getElementById("btn-back");
+  const next = document.getElementById("btn-next");
+  back.disabled = current === 0;
+  if (current === 5) {
+    next.textContent = "Install →";
+    next.className = "btn btn-accent";
+  } else if (current === 6) {
+    next.style.display = "none";
+    back.style.display = "none";
+  } else if (current === 7) {
+    next.textContent = "Reboot now";
+    next.className = "btn btn-primary";
+    back.style.display = "none";
+  } else {
+    next.textContent = "Next →";
+    next.className = "btn btn-primary";
+    next.style.display = "";
+    back.style.display = "";
+  }
+}
+
+function goTo(n) {
+  if (n < 0 || n >= PAGES) return;
+  document.getElementById("page-" + current).classList.remove("active");
+  current = n;
+  document.getElementById("page-" + current).classList.add("active");
+  updateSidebar();
+  updateButtons();
+  buildDots();
+  if (current === 6) startInstall();
+}
+
+function navigate(dir) {
+  if (current === 7) { alert("Rebooting… (preview only)"); return; }
+  goTo(current + dir);
+}
+
+let installRunning = false;
+function startInstall() {
+  if (installRunning) return;
+  installRunning = true;
+  progressIdx = 3;
+  slideIdx = 0;
+  tick();
+}
+
+function tick() {
+  if (current !== 6) return;
+  if (progressIdx >= progressSteps.length) return;
+  const [pct, label] = progressSteps[progressIdx];
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("progress-pct").textContent = pct + "%";
+  document.getElementById("progress-step").textContent = label;
+  const s = slides[slideIdx % slides.length];
+  document.getElementById("slide-title").textContent = s.title;
+  document.getElementById("slide-sub").textContent = s.sub;
+  progressIdx++;
+  slideIdx++;
+  if (progressIdx < progressSteps.length) {
+    setTimeout(tick, pct < 80 ? 1200 : 900);
+  } else {
+    setTimeout(() => goTo(7), 1200);
+  }
+}
+
+goTo(1);
+</script>
+</body>
+</html>
