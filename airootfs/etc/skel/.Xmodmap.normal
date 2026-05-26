@@ -1,0 +1,13 @@
+! ===== NORMAL MODE =====
+clear Lock
+clear Mod3
+
+! Restore Caps Lock
+keycode 66 = Caps_Lock
+add Lock = Caps_Lock
+
+! Restore Super keys
+keycode 133 = Super_L
+keycode 134 = Super_R
+clear Mod4
+add Mod3 = Super_L Super_R

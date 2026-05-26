@@ -3,7 +3,7 @@ Version=1.0
 Type=Application
 Name=Reaper Mode
 Comment=
-Exec=/home/craftworkson/.local/bin/toggle-reaper-mode.sh
+Exec=%h/.local/bin/toggle-reaper-mode.sh
 
 
 Icon=cockos-reaper

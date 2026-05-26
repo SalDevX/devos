@@ -1,0 +1,8 @@
+! ===== REAPER MODE =====
+
+clear Lock
+clear Mod3
+
+! Caps Lock becomes Hyper
+keycode 66 = Hyper_L
+add Mod3 = Hyper_L
