@@ -22,4 +22,7 @@ echo "[devos] locale & timezone"
 sed -i 's/^#\(en_US.UTF-8 UTF-8\)/\1/' "$ROOT/etc/locale.gen"
 arch-chroot "$ROOT" locale-gen
 
+echo "[devos] compiling dconf system db"
+arch-chroot "$ROOT" dconf update
+
 echo "[devos] setup complete"
