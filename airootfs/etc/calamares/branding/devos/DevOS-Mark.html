@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>DevOS — Mark (10 · monogram block · do)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:   #16140f;
+    --paper: #ffffff;
+    --rule:  #e6e3dc;
+    --mute:  #7a7363;
+  }
+  html, body { margin: 0; padding: 0; background: var(--paper); }
+  body {
+    font-family: "Geist", system-ui, sans-serif;
+    color: var(--ink); -webkit-font-smoothing: antialiased;
+  }
+  /* page chrome */
+  .page { max-width: 1280px; margin: 0 auto; padding: 56px 64px 120px; }
+  .meta-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.6px; color: var(--mute);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--rule); padding-bottom: 14px;
+  }
+  h1 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 400; font-size: 56px; letter-spacing: -1.5px;
+    line-height: 1.05; margin: 48px 0 12px;
+  }
+  h1 em { font-style: italic; }
+  .lede {
+    font-family: "Newsreader", Georgia, serif;
+    font-size: 18px; color: var(--mute); max-width: 56ch;
+    margin: 0 0 64px;
+  }
+  .section-head {
+    display: flex; align-items: baseline; gap: 18px;
+    margin: 72px 0 24px;
+  }
+  .section-num {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--mute); letter-spacing: 1px; text-transform: uppercase;
+  }
+  .section-title {
+    font-family: "Newsreader", Georgia, serif; font-size: 26px;
+    letter-spacing: -0.4px; font-weight: 500;
+  }
+  .section-rule { flex: 1; height: 1px; background: var(--rule); }
+
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    position: relative;
+  }
+  .card .corner-meta {
+    position: absolute; top: 10px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between;
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    letter-spacing: 0.5px; color: var(--mute);
+    text-transform: uppercase;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  .center { display: grid; place-items: center; }
+
+  .caption {
+    margin-top: 10px;
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--mute); letter-spacing: 0.4px;
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+
+/* ============================================================
+   DEFAULTS — editable via Tweaks panel, persisted to disk
+   ============================================================ */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "chamfer": 14,
+  "markFill": "solid",
+  "wordmarkStyle": "sans",
+  "wordmarkWeight": 600,
+  "letterSpace": -2,
+  "showMetadata": true,
+  "accent": "#2a4a6a"
+}/*EDITMODE-END*/;
+
+/* ============================================================
+   THE MARK — a cut-corner square containing "do"
+   Box drawn at unit scale 100; consumer passes `size`.
+   ============================================================ */
+function DevosMark({ size = 120, fg = "#16140f", bg = "transparent",
+                    chamfer = 14, fill = "solid", letterSpace = -2 }) {
+  const inkColor = fill === "outline" ? bg : fg;
+  const labelColor = fill === "outline" ? fg : (bg === "transparent" ? "#ffffff" : bg);
+  // path for chamfered square: top-left → top-right (cut) → bottom-right → bottom-left
+  const p = `M0 0 H${100 - chamfer} L100 ${chamfer} V100 H0 Z`;
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={{ display: "block" }}>
+      {fill === "outline" ? (
+        <path d={p} fill="none" stroke={fg} strokeWidth="2" />
+      ) : (
+        <path d={p} fill={fg} />
+      )}
+      <text x="50" y="68" textAnchor="middle"
+        fontFamily={`"Geist", system-ui, sans-serif`}
+        fontWeight="700" fontSize="52"
+        letterSpacing={letterSpace}
+        fill={labelColor}>do</text>
+    </svg>
+  );
+}
+
+/* ============================================================
+   THE WORDMARK
+   ============================================================ */
+function Wordmark({ size = 40, color = "#16140f", style = "sans",
+                    weight = 600, accent = "#16140f" }) {
+  if (style === "serif") {
+    return (
+      <span style={{
+        fontFamily: `"Newsreader", Georgia, serif`,
+        fontSize: size, fontWeight: 400,
+        letterSpacing: -size * 0.025, lineHeight: 1, color,
+      }}>
+        Dev<span style={{ fontStyle: "italic", color: accent }}>OS</span>
+      </span>
+    );
+  }
+  if (style === "mono") {
+    return (
+      <span style={{
+        fontFamily: `"JetBrains Mono", monospace`,
+        fontSize: size * 0.85, fontWeight: 500,
+        letterSpacing: -size * 0.015, lineHeight: 1, color,
+      }}>
+        devos
+      </span>
+    );
+  }
+  return (
+    <span style={{
+      fontFamily: `"Geist", system-ui, sans-serif`,
+      fontSize: size, fontWeight: weight,
+      letterSpacing: -size * 0.028, lineHeight: 1, color,
+    }}>
+      Dev<span style={{ color: accent }}>OS</span>
+    </span>
+  );
+}
+
+/* ============================================================
+   LOCKUP — mark + wordmark + optional metadata
+   ============================================================ */
+function Lockup({ scale = 1, color = "#16140f", bg = "#ffffff", t, showMeta }) {
+  const markSize = 120 * scale;
+  const gap = 22 * scale;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap }}>
+      <DevosMark size={markSize} fg={color} bg={bg}
+        chamfer={t.chamfer} fill={t.markFill} letterSpace={t.letterSpace} />
+      <div>
+        <Wordmark size={44 * scale} color={color}
+          style={t.wordmarkStyle} weight={t.wordmarkWeight} accent={t.accent} />
+        {showMeta && (
+          <div style={{
+            fontFamily: `"JetBrains Mono", monospace`,
+            fontSize: 11 * scale, color: "#7a7363",
+            marginTop: 8 * scale, letterSpacing: 1.4,
+            textTransform: "uppercase",
+          }}>arch · xfce · lts</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   IN-CONTEXT MOCKUPS
+   ============================================================ */
+function FaviconStrip({ t }) {
+  const sizes = [16, 24, 32, 48, 64];
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 28, padding: 36 }}>
+      {sizes.map(s => (
+        <div key={s} style={{ textAlign: "center" }}>
+          <div style={{
+            width: s, height: s,
+            display: "grid", placeItems: "center",
+            imageRendering: "pixelated",
+          }}>
+            <DevosMark size={s} fg="#16140f"
+              chamfer={Math.max(2, Math.round(t.chamfer * s / 100))}
+              fill={t.markFill} letterSpace={t.letterSpace} />
+          </div>
+          <div className="caption" style={{ marginTop: 8 }}>{s}px</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BrowserTab({ t }) {
+  return (
+    <div style={{
+      background: "#e9e6df", padding: "14px 14px 0",
+      borderTopLeftRadius: 8, borderTopRightRadius: 8,
+    }}>
+      <div style={{
+        background: "#ffffff",
+        borderTopLeftRadius: 6, borderTopRightRadius: 6,
+        padding: "8px 12px", display: "flex", alignItems: "center",
+        gap: 10, maxWidth: 280,
+        boxShadow: "0 -1px 0 rgba(0,0,0,0.04)",
+      }}>
+        <DevosMark size={14} fg="#16140f" chamfer={2}
+          fill={t.markFill} letterSpace={t.letterSpace} />
+        <span style={{
+          fontFamily: `"Geist", sans-serif`, fontSize: 12,
+          color: "#16140f",
+        }}>DevOS — docs</span>
+        <span style={{ marginLeft: "auto", color: "#7a7363", fontSize: 14 }}>×</span>
+      </div>
+      <div style={{
+        background: "#ffffff", padding: "10px 14px",
+        fontFamily: `"JetBrains Mono", monospace`, fontSize: 11,
+        color: "#7a7363",
+        borderBottom: "1px solid #e6e3dc",
+      }}>devos.dev/install</div>
+    </div>
+  );
+}
+
+function TerminalMock({ t }) {
+  return (
+    <div style={{
+      background: "#16140f", color: "#f3efe7",
+      fontFamily: `"JetBrains Mono", monospace`, fontSize: 13,
+      padding: 24, lineHeight: 1.7,
+      borderRadius: 6,
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, opacity: 0.6 }}>
+        <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3a3730" }} />
+        <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3a3730" }} />
+        <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3a3730" }} />
+        <span style={{ marginLeft: 8, fontSize: 11 }}>user@devos — zsh</span>
+      </div>
+      <div><span style={{ color: "#a89c80" }}>user@devos</span> <span style={{ color: "#7a7363" }}>~</span> $ neofetch</div>
+      <div style={{ display: "flex", gap: 28, marginTop: 14 }}>
+        <DevosMark size={88} fg="#f3efe7" bg="#16140f"
+          chamfer={t.chamfer} fill="solid" letterSpace={t.letterSpace} />
+        <div style={{ fontSize: 12 }}>
+          <div><span style={{ color: "#a89c80" }}>OS</span>      DevOS (Arch-based)</div>
+          <div><span style={{ color: "#a89c80" }}>Kernel</span>  6.6.42-1-lts</div>
+          <div><span style={{ color: "#a89c80" }}>WM</span>      xfwm4 (XFCE)</div>
+          <div><span style={{ color: "#a89c80" }}>Shell</span>   zsh 5.9</div>
+          <div><span style={{ color: "#a89c80" }}>Term</span>    xfce4-terminal</div>
+          <div><span style={{ color: "#a89c80" }}>Edition</span> 01 — developer</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BootSplash({ t }) {
+  return (
+    <div style={{
+      background: "#16140f", color: "#f3efe7",
+      height: 320, position: "relative", overflow: "hidden",
+      borderRadius: 4,
+    }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        display: "grid", placeItems: "center",
+      }}>
+        <Lockup scale={1.1} color="#f3efe7" bg="#16140f" t={{...t, accent: "#f3efe7"}} showMeta={t.showMetadata} />
+      </div>
+      <div style={{
+        position: "absolute", top: 18, left: 24, right: 24,
+        display: "flex", justifyContent: "space-between",
+        fontFamily: `"JetBrains Mono", monospace`, fontSize: 10,
+        color: "#7a7363", letterSpacing: 0.6, textTransform: "uppercase",
+      }}>
+        <span>— boot</span><span>tty1 · autologin</span>
+      </div>
+      <div style={{
+        position: "absolute", bottom: 18, left: 24, right: 24,
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        fontFamily: `"JetBrains Mono", monospace`, fontSize: 10,
+        color: "#7a7363", letterSpacing: 0.6, textTransform: "uppercase",
+      }}>
+        <span>starting xfce…</span>
+        <span style={{
+          width: 80, height: 1, background: "#3a3730", position: "relative",
+        }}>
+          <span style={{
+            position: "absolute", left: 0, top: 0, height: 1,
+            width: "42%", background: "#f3efe7",
+          }} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function WelcomeMock({ t }) {
+  return (
+    <div style={{
+      background: "#ffffff", padding: 56, height: 320,
+      position: "relative", overflow: "hidden",
+    }}>
+      <div style={{
+        position: "absolute", top: 18, left: 24, right: 24,
+        display: "flex", justifyContent: "space-between",
+        fontFamily: `"JetBrains Mono", monospace`, fontSize: 10,
+        color: "#7a7363", letterSpacing: 0.6, textTransform: "uppercase",
+      }}>
+        <span>— welcome</span><span>01 · first run</span>
+      </div>
+      <div style={{ marginTop: 36 }}>
+        <Lockup scale={0.95} color="#16140f" bg="#ffffff" t={t} showMeta={false} />
+      </div>
+      <div style={{
+        fontFamily: `"Newsreader", Georgia, serif`,
+        fontSize: 28, letterSpacing: -0.5, lineHeight: 1.2,
+        maxWidth: 520, marginTop: 28,
+      }}>
+        Welcome. Your workstation is ready — <span style={{ color: "#7a7363", fontStyle: "italic" }}>boundaries over abstractions</span>.
+      </div>
+      <div style={{
+        position: "absolute", bottom: 24, left: 56, right: 56,
+        display: "flex", justifyContent: "space-between",
+        fontFamily: `"JetBrains Mono", monospace`, fontSize: 11,
+        color: "#7a7363",
+      }}>
+        <span>arch · xfce · lts</span>
+        <span>v1.0 · 2026</span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   APP
+   ============================================================ */
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <div className="page">
+      <div className="meta-row">
+        <span>— branding · devos</span>
+        <span>10 · monogram block · do · refined</span>
+        <span>edition 01</span>
+      </div>
+
+      <h1>A cut-corner monogram for <em>devos</em>.</h1>
+      <p className="lede">
+        Direction 10 brought forward, on pure white. The chamfer reads as a
+        quiet nod to the Arch triangle without copying it; the "do" sits
+        inside a near-black block that holds up at 16px and at 1920.
+      </p>
+
+      {/* ============== 01 PRIMARY LOCKUP ============== */}
+      <div className="section-head">
+        <span className="section-num">— 01</span>
+        <span className="section-title">Primary lockup</span>
+        <span className="section-rule" />
+      </div>
+      <div className="card" style={{ padding: "96px 64px" }}>
+        <div className="corner-meta">
+          <span>lockup / primary</span>
+          <span>on paper · #ffffff</span>
+        </div>
+        <div className="center"><Lockup scale={1.4} t={t} showMeta={t.showMetadata} /></div>
+      </div>
+
+      <div className="grid-2" style={{ marginTop: 24 }}>
+        <div className="card" style={{ padding: "64px 48px" }}>
+          <div className="corner-meta">
+            <span>mark / standalone</span>
+            <span>140</span>
+          </div>
+          <div className="center" style={{ minHeight: 200 }}>
+            <DevosMark size={140} fg="#16140f"
+              chamfer={t.chamfer} fill={t.markFill} letterSpace={t.letterSpace} />
+          </div>
+        </div>
+        <div className="card" style={{ padding: "64px 48px" }}>
+          <div className="corner-meta">
+            <span>wordmark / standalone</span>
+            <span>56 / 700</span>
+          </div>
+          <div className="center" style={{ minHeight: 200 }}>
+            <Wordmark size={56} style={t.wordmarkStyle}
+              weight={t.wordmarkWeight} accent={t.accent} />
+          </div>
+        </div>
+      </div>
+
+      {/* ============== 02 INVERSE ============== */}
+      <div className="section-head">
+        <span className="section-num">— 02</span>
+        <span className="section-title">Inverse</span>
+        <span className="section-rule" />
+      </div>
+      <div className="card" style={{ padding: "96px 64px", background: "#16140f" }}>
+        <div className="corner-meta" style={{ color: "#7a7363" }}>
+          <span>lockup / inverse</span>
+          <span>on ink · #16140f</span>
+        </div>
+        <div className="center">
+          <Lockup scale={1.4} color="#f3efe7" bg="#16140f"
+            t={{...t, accent: t.accent === "#16140f" ? "#f3efe7" : t.accent}}
+            showMeta={t.showMetadata} />
+        </div>
+      </div>
+
+      {/* ============== 03 SIZE LADDER ============== */}
+      <div className="section-head">
+        <span className="section-num">— 03</span>
+        <span className="section-title">Size ladder · favicon → app icon</span>
+        <span className="section-rule" />
+      </div>
+      <div className="card">
+        <div className="corner-meta">
+          <span>mark / pixel sizes</span>
+          <span>16 → 64</span>
+        </div>
+        <FaviconStrip t={t} />
+      </div>
+
+      {/* ============== 04 IN CONTEXT ============== */}
+      <div className="section-head">
+        <span className="section-num">— 04</span>
+        <span className="section-title">In context</span>
+        <span className="section-rule" />
+      </div>
+
+      <div className="grid-2">
+        <div>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <BootSplash t={t} />
+          </div>
+          <div className="caption">boot splash · plymouth · 1920×1080 crop</div>
+        </div>
+        <div>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <WelcomeMock t={t} />
+          </div>
+          <div className="caption">welcome.png · first-run greeter</div>
+        </div>
+      </div>
+
+      <div className="grid-2" style={{ marginTop: 24 }}>
+        <div>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <TerminalMock t={t} />
+          </div>
+          <div className="caption">neofetch · terminal identity</div>
+        </div>
+        <div>
+          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+            <BrowserTab t={t} />
+          </div>
+          <div className="caption">favicon in browser tab</div>
+        </div>
+      </div>
+
+      {/* ============== 05 CONSTRUCTION ============== */}
+      <div className="section-head">
+        <span className="section-num">— 05</span>
+        <span className="section-title">Construction</span>
+        <span className="section-rule" />
+      </div>
+      <div className="card" style={{ padding: 48 }}>
+        <div className="corner-meta">
+          <span>geometry / 100u grid</span>
+          <span>chamfer · {t.chamfer}u</span>
+        </div>
+        <Construction t={t} />
+      </div>
+
+      {/* ============== TWEAKS PANEL ============== */}
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Mark">
+          <TweakSlider label="Chamfer (cut corner)"
+            value={t.chamfer} min={0} max={40} step={1}
+            onChange={(v) => setTweak("chamfer", v)} />
+          <TweakRadio label="Fill"
+            value={t.markFill}
+            options={[{value:"solid",label:"Solid"},{value:"outline",label:"Outline"}]}
+            onChange={(v) => setTweak("markFill", v)} />
+          <TweakSlider label='"do" letter-space'
+            value={t.letterSpace} min={-6} max={2} step={0.5}
+            onChange={(v) => setTweak("letterSpace", v)} />
+        </TweakSection>
+
+        <TweakSection label="Wordmark">
+          <TweakRadio label="Style"
+            value={t.wordmarkStyle}
+            options={[
+              {value:"sans",label:"Sans"},
+              {value:"serif",label:"Serif"},
+              {value:"mono",label:"Mono"},
+            ]}
+            onChange={(v) => setTweak("wordmarkStyle", v)} />
+          <TweakSlider label="Weight (sans only)"
+            value={t.wordmarkWeight} min={400} max={800} step={100}
+            onChange={(v) => setTweak("wordmarkWeight", v)} />
+          <TweakColor label="Accent (OS)"
+            value={t.accent}
+            options={["#16140f","#8a3a2a","#3a5a3a","#2a4a6a"]}
+            onChange={(v) => setTweak("accent", v)} />
+        </TweakSection>
+
+        <TweakSection label="Lockup">
+          <TweakToggle label='Show "arch · xfce · lts" tagline'
+            value={t.showMetadata}
+            onChange={(v) => setTweak("showMetadata", v)} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+/* construction diagram */
+function Construction({ t }) {
+  const px = 4; // 1 unit = 4px on screen
+  const S = 100 * px;
+  return (
+    <div style={{ display: "flex", gap: 48, alignItems: "center", justifyContent: "center", padding: "32px 0" }}>
+      <svg width={S} height={S} viewBox="0 0 100 100" style={{ overflow: "visible" }}>
+        {/* grid */}
+        {[...Array(11)].map((_,i)=>(
+          <line key={`v${i}`} x1={i*10} y1="0" x2={i*10} y2="100" stroke="#e6e3dc" strokeWidth="0.2" />
+        ))}
+        {[...Array(11)].map((_,i)=>(
+          <line key={`h${i}`} x1="0" y1={i*10} x2="100" y2={i*10} stroke="#e6e3dc" strokeWidth="0.2" />
+        ))}
+        {/* the mark */}
+        <path d={`M0 0 H${100-t.chamfer} L100 ${t.chamfer} V100 H0 Z`}
+          fill="none" stroke="#16140f" strokeWidth="0.5" />
+        {/* chamfer dimension lines */}
+        <line x1={100-t.chamfer} y1="-4" x2="100" y2="-4" stroke="#7a7363" strokeWidth="0.2" />
+        <line x1={100-t.chamfer} y1="-6" x2={100-t.chamfer} y2="-2" stroke="#7a7363" strokeWidth="0.2" />
+        <line x1="100" y1="-6" x2="100" y2="-2" stroke="#7a7363" strokeWidth="0.2" />
+        <text x={100 - t.chamfer/2} y="-7" textAnchor="middle"
+          fontFamily="JetBrains Mono" fontSize="3" fill="#7a7363">{t.chamfer}u</text>
+        {/* the do glyphs */}
+        <text x="50" y="68" textAnchor="middle"
+          fontFamily="Geist" fontWeight="700" fontSize="52"
+          letterSpacing={t.letterSpace}
+          fill="#16140f" opacity="0.15">do</text>
+      </svg>
+
+      <div style={{ fontFamily: `"JetBrains Mono", monospace`, fontSize: 12, color: "#16140f", lineHeight: 2 }}>
+        <div><span style={{ color: "#7a7363" }}>box</span>      100 × 100u</div>
+        <div><span style={{ color: "#7a7363" }}>chamfer</span>  {t.chamfer}u (top-right)</div>
+        <div><span style={{ color: "#7a7363" }}>type</span>     Geist 700</div>
+        <div><span style={{ color: "#7a7363" }}>size</span>     52u</div>
+        <div><span style={{ color: "#7a7363" }}>baseline</span> y = 68</div>
+        <div><span style={{ color: "#7a7363" }}>tracking</span> {t.letterSpace}</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
