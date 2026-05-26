@@ -66,8 +66,44 @@ cat ~/devos-local/devos-aur-built.txt >> packages.x86_64
 
 ## Install to disk
 
-From the booted live ISO (or any Arch live env): partition, format, and mount your
-target (`/mnt` = root, `/mnt/boot` = EFI System Partition), then:
+### 1 — Connect to WiFi (skip if using ethernet)
+
+The `wl` module (Broadcom BCM) loads automatically on boot. Connect before running
+the installer — `pacstrap` needs internet:
+
+```bash
+nmtui        # TUI: pick your network, enter password, Activate
+# or
+nmcli device wifi connect "SSID" password "passphrase"
+```
+
+Verify: `ping -c1 archlinux.org`
+
+### 2 — Partition the disk
+
+```bash
+lsblk                        # identify target (e.g. /dev/sda, /dev/nvme0n1)
+cfdisk /dev/sdX              # GPT → new partition table
+                             #   /dev/sdX1  512M   EFI System
+                             #   /dev/sdX2  rest   Linux filesystem
+                             # Write → Quit
+```
+
+### 3 — Format
+
+```bash
+mkfs.fat -F32 /dev/sdX1
+mkfs.ext4     /dev/sdX2
+```
+
+### 4 — Mount
+
+```bash
+mount          /dev/sdX2 /mnt
+mount --mkdir  /dev/sdX1 /mnt/boot
+```
+
+### 5 — Run the installer
 
 ```bash
 sudo ./installer/install.sh
