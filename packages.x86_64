@@ -9,7 +9,6 @@ arch-install-scripts
 archiso
 kpmcore
 parted
-archlinux-artwork
 arduino-cli
 arduino-language-server
 aria2
