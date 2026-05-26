@@ -51,7 +51,6 @@ clojure
 cloudflared
 cmake
 coin
-conky
 cpupower
 csvkit
 ctags
