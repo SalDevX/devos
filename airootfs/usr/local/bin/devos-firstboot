@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# DevOS first-boot: enable hardware-specific services on the REAL machine
+# (this runs on the user's hardware, unlike customize_airootfs.sh which runs in
+# the build chroot), then disable self. Idempotent via a stamp file.
+set -eu
+
+STAMP=/var/lib/devos/firstboot-done
+[ -e "$STAMP" ] && exit 0
+mkdir -p /var/lib/devos
+
+is_apple() { dmidecode -s system-manufacturer 2>/dev/null | grep -qi apple; }
+is_intel() { grep -qi GenuineIntel /proc/cpuinfo 2>/dev/null; }
+
+if is_apple; then
+  systemctl enable --now \
+    mbpfan.service \
+    disable-apple-display-audio.service \
+    disable-usb-autosuspend.service \
+    disable-wakeup.service 2>/dev/null || true
+fi
+
+if is_intel; then
+  systemctl enable --now thermald.service 2>/dev/null || true
+fi
+
+touch "$STAMP"
+systemctl disable devos-firstboot.service 2>/dev/null || true

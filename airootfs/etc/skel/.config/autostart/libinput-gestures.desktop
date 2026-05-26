@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Libinput Gestures
+Comment=Touchpad / Magic-Trackpad multitouch gestures
+Exec=libinput-gestures-setup start
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+Hidden=false

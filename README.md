@@ -114,6 +114,17 @@ udev rules (J-Link, PlatformIO, Microchip) are kept on purpose.
   placeholder root PARTUUID is auto-filled by `install.sh`.
 - `nvim` config is a separate git repo — clone it into the skel or document it.
 
+## Docker (opt-in)
+Docker is **not** enabled by default and the `docker` group is **not** pre-created —
+running the daemon and granting socket access is a privilege decision each user makes.
+To opt in:
+
+```bash
+sudo pacman -S --needed docker        # already present if kept in packages.x86_64
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER"       # log out/in for the group to apply
+```
+
 ## License
 - **Repo scripts & configs** (`profiledef.sh`, `tools/`, `installer/`, `airootfs/` overlays,
   and the dotfiles in `airootfs/etc/skel`) — **MIT**, see `LICENSE`.

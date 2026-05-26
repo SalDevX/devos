@@ -73,6 +73,7 @@ openssl-1.1
 oranchelo-icon-theme-git
 pacman4console
 paru-bin
+playwright
 platformio-git
 powerstat
 prot16-xfce4-terminal
@@ -100,8 +101,6 @@ spell
 urw
 usbmon
 v4l2loopback-dc-dkms
-vala-panel-appmenu
-vala-panel-appmenu-locale
 vala-panel-appmenu-registrar
 vala-panel-appmenu-xfce
 vieb
