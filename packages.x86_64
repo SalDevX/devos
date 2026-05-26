@@ -39,7 +39,6 @@ boost
 brightnessctl
 broadcom-wl-dkms
 cabextract
-calibre
 cdrtools
 chrpath
 cjson
@@ -82,7 +81,6 @@ filezilla
 fio
 firejail
 flatpak
-foliate
 fwupd
 fzf
 gammastep
@@ -203,7 +201,6 @@ nss-mdns
 nuspell
 nvm
 obsidian
-obs-studio
 ocrfeeder
 onboard
 openbox
@@ -267,7 +264,6 @@ qtcreator
 rclone
 redshift
 reflector
-remmina
 ripgrep
 ristretto
 rkhunter
