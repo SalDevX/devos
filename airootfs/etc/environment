@@ -1,0 +1,4 @@
+XDG_DESKTOP_PORTAL=xdg-desktop-portal-xapp
+# Intel VAAPI. i965 is the legacy driver for Haswell-era iGPUs; on newer Intel
+# use LIBVA_DRIVER_NAME=iHD (provided by intel-media-driver) instead.
+LIBVA_DRIVER_NAME=i965

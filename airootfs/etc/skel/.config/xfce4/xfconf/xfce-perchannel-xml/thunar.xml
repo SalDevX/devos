@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="thunar" version="1.0">
+  <property name="last-view" type="string" value="ThunarIconView"/>
+  <property name="last-icon-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_75_PERCENT"/>
+  <property name="last-separator-position" type="int" value="197"/>
+  <property name="last-window-maximized" type="bool" value="false"/>
+  <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_25_PERCENT"/>
+  <property name="last-details-view-column-widths" type="string" value="119,126,124,108,79,970,89,446,404,89,112,77,114,421"/>
+  <property name="last-sort-column" type="string" value="THUNAR_COLUMN_NAME"/>
+  <property name="last-sort-order" type="string" value="GTK_SORT_ASCENDING"/>
+  <property name="last-window-width" type="int" value="1056"/>
+  <property name="last-window-height" type="int" value="739"/>
+  <property name="misc-single-click" type="bool" value="false"/>
+  <property name="misc-text-beside-icons" type="bool" value="true"/>
+  <property name="last-details-view-visible-columns" type="string" value="THUNAR_COLUMN_DATE_CREATED,THUNAR_COLUMN_DATE_ACCESSED,THUNAR_COLUMN_DATE_MODIFIED,THUNAR_COLUMN_LOCATION,THUNAR_COLUMN_GROUP,THUNAR_COLUMN_MIME_TYPE,THUNAR_COLUMN_NAME,THUNAR_COLUMN_OWNER,THUNAR_COLUMN_PERMISSIONS,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_SIZE_IN_BYTES,THUNAR_COLUMN_TYPE"/>
+  <property name="misc-thumbnail-draw-frames" type="bool" value="true"/>
+  <property name="shortcuts-icon-size" type="string" value="THUNAR_ICON_SIZE_32"/>
+  <property name="tree-icon-size" type="string" value="THUNAR_ICON_SIZE_32"/>
+  <property name="shortcuts-icon-emblems" type="bool" value="true"/>
+  <property name="misc-image-preview-mode" type="string" value="THUNAR_IMAGE_PREVIEW_MODE_EMBEDDED"/>
+  <property name="last-splitview-separator-position" type="int" value="477"/>
+  <property name="last-show-hidden" type="bool" value="true"/>
+  <property name="misc-highlighting-enabled" type="bool" value="true"/>
+  <property name="last-statusbar-visible" type="bool" value="true"/>
+  <property name="last-menubar-visible" type="bool" value="true"/>
+  <property name="last-compact-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_100_PERCENT"/>
+  <property name="last-location-bar" type="string" value="ThunarLocationEntry"/>
+  <property name="misc-directory-specific-settings" type="bool" value="true"/>
+  <property name="misc-folders-first" type="bool" value="true"/>
+  <property name="misc-change-window-icon" type="bool" value="true"/>
+  <property name="tree-icon-emblems" type="bool" value="true"/>
+  <property name="last-image-preview-visible" type="bool" value="true"/>
+  <property name="last-side-pane" type="string" value="ThunarTreePane"/>
+  <property name="default-view" type="string" value="ThunarIconView"/>
+  <property name="misc-file-size-binary" type="bool" value="true"/>
+  <property name="misc-use-csd" type="bool" value="true"/>
+  <property name="misc-symbolic-icons-in-sidepane" type="bool" value="true"/>
+  <property name="misc-show-delete-action" type="bool" value="false"/>
+  <property name="misc-expandable-folders" type="bool" value="true"/>
+</channel>

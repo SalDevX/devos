@@ -1,0 +1,1 @@
+SUBSYSTEM=="input", ATTRS{name}=="Apple Magic Mouse 2", ENV{ID_INPUT_MOUSE}="1"

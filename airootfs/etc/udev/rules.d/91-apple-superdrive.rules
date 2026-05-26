@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="block", ATTRS{idVendor}=="05ac", ATTRS{idProduct}=="1500", RUN+="/usr/bin/sg_raw --cmdset=1 /dev/%k EA 00 00 00 00 00 01"

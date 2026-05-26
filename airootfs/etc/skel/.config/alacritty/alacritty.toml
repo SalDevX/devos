@@ -1,0 +1,89 @@
+# ~/.config/alacritty/alacritty.toml
+# Focused readability theme — tuned for learning logs and shell comprehension
+# for DevOS
+
+[window]
+opacity = 8.0
+padding.x = 16
+padding.y = 14
+decorations = "None"
+dynamic_padding = true
+
+[scrolling]
+history = 100000  # keep large history for reading logs
+multiplier = 3    # faster scroll per wheel notch
+
+[colors.primary]
+background = "#141516"
+foreground = "#C8CACC"
+
+[colors.cursor]
+text = "#141516"
+cursor = "#00FF99"
+
+[colors.selection]
+text = "CellForeground"
+background = "#404040"
+
+# === Accented log-level colors ===
+[colors.normal]
+black = "#1E1E1E"
+red = "#FF5F5F"      # errors
+green = "#5FFF87"    # success
+yellow = "#FFD75F"   # warnings
+blue = "#5FAFFF"     # info
+magenta = "#AF87FF"
+cyan = "#5FD7D7"
+white = "#C0C0C0"
+
+[colors.bright]
+black = "#4E4E4E"
+red = "#FF8787"
+green = "#87FFAF"
+yellow = "#FFFF87"
+blue = "#87D7FF"
+magenta = "#D7AFFF"
+cyan = "#87FFFF"
+white = "#FFFFFF"
+
+[font]
+normal = { family = "Menlo", style = "Regular" }
+bold = { family = "Menlo", style = "Bold" }
+italic = { family = "Menlo", style = "Italic" }
+bold_italic = { family = "Menlo", style = "Bold Italic" }
+
+# Comfortable size for reading + small extra spacing for clarity
+size = 10.5
+offset = { x = 0, y = 2 }
+glyph_offset = { x = 0, y = 0 }
+builtin_box_drawing = true
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+style = { shape = "Underline", blinking = "off" }
+blink_interval = 1000
+unfocused_hollow = true
+
+[hints]
+[[hints.enabled]]
+hyperlinks = true
+persist = false
+post_processing = true
+action = "Copy"
+command = "xdg-open"
+binding = { key = "O", mods = "Control|Shift" }
+mouse = { enabled = true, mods = "Control" }
+regex = "(http://|https://|ftp://|mailto:)[^\\s<>\"'`]+"
+
+[terminal.shell]
+program = "/usr/bin/zsh"
+args = ["-c", "tmux"]
+
+[[keyboard.bindings]]
+key = "F11"
+action = "ToggleFullscreen"
+
+
+

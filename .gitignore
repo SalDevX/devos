@@ -1,0 +1,18 @@
+# Secrets — never commit
+*.secret
+.zshenv.secret
+
+# Build artifacts
+out/
+work/
+*.iso
+*.pkg.tar.zst
+
+# Local AUR repo
+devos-local/
+
+# build-aur-repo.sh outputs
+.src/
+build-success.log
+build-failed.log
+devos-aur-built.txt

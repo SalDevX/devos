@@ -1,0 +1,1 @@
+SUBSYSTEM=="input", ATTRS{name}=="Virtual core keyboard", OPTIONS="ignore_device"

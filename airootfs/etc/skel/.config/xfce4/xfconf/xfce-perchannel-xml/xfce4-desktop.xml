@@ -1,0 +1,82 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="xfce4-desktop" version="1.0">
+  <property name="last-settings-migration-version" type="uint" value="1"/>
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitoreDP-1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="3"/>
+          <property name="image-style" type="int" value="4"/>
+        </property>
+      </property>
+      <property name="monitorDP-2" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/Seed of Life 2.jpg"/>
+        </property>
+      </property>
+      <property name="monitoreDP1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/Seed of Life 2.jpg"/>
+          <property name="image-style" type="int" value="4"/>
+        </property>
+      </property>
+      <property name="monitorDP2" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
+          <property name="image-style" type="int" value="1"/>
+        </property>
+      </property>
+      <property name="monitorDP1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
+          <property name="image-style" type="int" value="1"/>
+        </property>
+      </property>
+    </property>
+    <property name="single-workspace-mode" type="bool" value="true"/>
+    <property name="single-workspace-number" type="int" value="0"/>
+  </property>
+  <property name="desktop-icons" type="empty">
+    <property name="use-custom-label-text-color" type="bool" value="false"/>
+    <property name="label-text-color" type="array">
+      <value type="double" value="0.23921568627450981"/>
+      <value type="double" value="0.2196078431372549"/>
+      <value type="double" value="0.27450980392156865"/>
+      <value type="double" value="1"/>
+    </property>
+    <property name="use-custom-font-size" type="bool" value="true"/>
+    <property name="font-size" type="double" value="10"/>
+    <property name="show-hidden-files" type="bool" value="true"/>
+    <property name="show-tooltips" type="bool" value="false"/>
+    <property name="primary" type="bool" value="false"/>
+    <property name="use-custom-label-background-color" type="bool" value="false"/>
+    <property name="label-background-color" type="array">
+      <value type="double" value="1"/>
+      <value type="double" value="0.98865248226950353"/>
+      <value type="double" value="0.8666666666666667"/>
+      <value type="double" value="1"/>
+    </property>
+    <property name="icon-size" type="uint" value="54"/>
+    <property name="single-click" type="bool" value="true"/>
+    <property name="style" type="int" value="2"/>
+    <property name="single-click-underline-hover" type="bool" value="false"/>
+    <property name="font" type="string" value="Noto Sans 10"/>
+    <property name="file-icons" type="empty">
+      <property name="migrated-4.19" type="array">
+        <value type="string" value="539c44e590387d0c364cc3367a3e39faa1766fd2"/>
+      </property>
+    </property>
+  </property>
+  <property name="last" type="empty">
+    <property name="window-width" type="int" value="660"/>
+    <property name="window-height" type="int" value="669"/>
+  </property>
+</channel>
