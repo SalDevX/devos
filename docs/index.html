@@ -1,9 +1,857 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta http-equiv="refresh" content="0; url=installer-preview.html"/>
-<title>DevOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="DevOS — Arch Linux for developers. XFCE desktop, LTS kernel, Calamares GUI installer, Apple MacBook ready."/>
+<title>DevOS — Arch Linux for Developers</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+
+:root {
+  --blue:        #1793d1;
+  --blue-glow:   rgba(23,147,209,0.35);
+  --blue-dim:    rgba(23,147,209,0.12);
+  --blue-border: rgba(23,147,209,0.25);
+  --bg:          #08080f;
+  --surface:     rgba(255,255,255,0.04);
+  --border:      rgba(255,255,255,0.07);
+  --border-h:    rgba(255,255,255,0.14);
+  --text:        #e8e8e8;
+  --muted:       #888;
+  --dim:         #3a3a3a;
+  --radius:      16px;
+}
+
+html { scroll-behavior: smooth }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background blobs ── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+.blob-1 {
+  width: 70vw; height: 70vw;
+  top: -25%; right: -20%;
+  background: radial-gradient(circle, rgba(23,147,209,0.13) 0%, transparent 65%);
+}
+.blob-2 {
+  width: 55vw; height: 55vw;
+  bottom: -20%; left: -15%;
+  background: radial-gradient(circle, rgba(80,40,180,0.1) 0%, transparent 65%);
+}
+.blob-3 {
+  width: 40vw; height: 40vw;
+  top: 40%; left: 30%;
+  background: radial-gradient(circle, rgba(23,147,209,0.05) 0%, transparent 65%);
+}
+
+/* Grid overlay */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(23,147,209,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23,147,209,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.page { position: relative; z-index: 1 }
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(8,8,15,0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+}
+.nav-logo span:first-child { color: var(--blue) }
+.nav-logo span:last-child  { color: #fff }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--text) }
+
+.nav-btn {
+  padding: 7px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+  background: var(--blue);
+  box-shadow: 0 0 18px rgba(23,147,209,0.3);
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+.nav-btn:hover { opacity: 0.88; box-shadow: 0 0 28px rgba(23,147,209,0.5) }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 72px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  margin-bottom: 28px;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1) }
+  50%       { opacity: 0.5; transform: scale(0.7) }
+}
+
+.hero-title {
+  font-size: clamp(64px, 13vw, 120px);
+  font-weight: 800;
+  letter-spacing: -4px;
+  line-height: 0.92;
+  margin-bottom: 24px;
+}
+.hero-title .dev {
+  color: var(--blue);
+  filter: drop-shadow(0 0 40px rgba(23,147,209,0.55));
+}
+.hero-title .os { color: #fff }
+
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 20px);
+  color: var(--muted);
+  max-width: 540px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+.hero-sub strong { color: var(--text) }
+
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 64px;
+}
+
+.btn-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+  background: var(--blue);
+  box-shadow: 0 0 32px rgba(23,147,209,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 48px rgba(23,147,209,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-h);
+  backdrop-filter: blur(12px);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.btn-glass:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+/* Animation frame */
+.hero-visual {
+  width: 100%;
+  max-width: 960px;
+}
+.anim-frame {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-h);
+  box-shadow:
+    0 0 0 1px rgba(23,147,209,0.08),
+    0 32px 80px rgba(0,0,0,0.7),
+    0 0 100px rgba(23,147,209,0.08);
+}
+.anim-frame img { display: block; width: 100%; height: auto }
+.anim-bar {
+  background: rgba(14,14,22,0.9);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.anim-bar-label {
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--dim);
+}
+.anim-bar a {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+}
+.anim-bar a:hover { text-decoration: underline }
+
+/* ── STATS ── */
+.stats {
+  padding: 0 24px 96px;
+}
+.stats-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background-clip: padding-box;
+  overflow: hidden;
+}
+/* The 1px gaps use background color showing through */
+.stats-inner { background: var(--border) }
+.stat-item {
+  background: var(--bg);
+  padding: 32px 20px;
+  text-align: center;
+  transition: background 0.2s;
+}
+.stat-item:hover { background: rgba(23,147,209,0.06) }
+.stat-n {
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--blue);
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(23,147,209,0.5);
+}
+.stat-l {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-s {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--dim);
+}
+
+/* ── FEATURES ── */
+.features {
+  padding: 0 24px 96px;
+}
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+.section-sub {
+  margin-top: 12px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.features-grid {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.feat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(23,147,209,0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.feat-card:hover {
+  background: rgba(23,147,209,0.07);
+  border-color: var(--blue-border);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(23,147,209,0.15);
+}
+.feat-card:hover::before { opacity: 1 }
+
+.feat-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.feat-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+.feat-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.feat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+.chip {
+  font-size: 10px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid rgba(23,147,209,0.2);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── INSTALLER PREVIEW ── */
+.preview-section {
+  padding: 0 24px 96px;
+}
+.preview-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.browser-wrap {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-h);
+  box-shadow:
+    0 0 0 1px rgba(23,147,209,0.06),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 80px rgba(23,147,209,0.07);
+}
+.browser-chrome {
+  background: #111119;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.b-dots { display: flex; gap: 7px; flex-shrink: 0 }
+.b-dot  { width: 12px; height: 12px; border-radius: 50% }
+.b-dot.r { background: #ff5f57 }
+.b-dot.y { background: #ffbd2e }
+.b-dot.g { background: #28ca41 }
+.b-url {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--muted);
+}
+.b-open {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 6px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  transition: background 0.2s;
+}
+.b-open:hover { background: rgba(23,147,209,0.2) }
+.browser-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 680px;
+  border: none;
+  background: #111;
+}
+
+/* ── COMPAT TABLE ── */
+.compat-section {
+  padding: 0 24px 96px;
+}
+.compat-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.compat-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+.compat-table th {
+  background: rgba(255,255,255,0.03);
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.compat-table td {
+  padding: 14px 20px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.compat-table tr:last-child td { border-bottom: none }
+.compat-table tr:hover td { background: rgba(23,147,209,0.04) }
+.compat-table td:first-child { color: var(--text); font-weight: 500 }
+.compat-table td:last-child { text-align: center; font-size: 16px }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 24px;
+  text-align: center;
+}
+.footer-logo {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+.footer-logo span:first-child { color: var(--blue) }
+.footer-logo span:last-child  { color: #fff }
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.footer-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--blue) }
+.footer-copy {
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  max-width: 960px;
+  margin: 0 auto 96px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ── SCROLL FADE-IN ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+</style>
 </head>
-<body></body>
+<body>
+
+<!-- Background -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <!-- ── NAV ── -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <span>Dev</span><span>OS</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#features">Features</a>
+      <a class="nav-link" href="#preview">Installer</a>
+      <a class="nav-link" href="https://github.com/SalDevX/devos" target="_blank">GitHub</a>
+      <a class="nav-btn"  href="#preview">Live Preview</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-dot"></span>
+      Arch Linux · Rolling Release
+    </div>
+
+    <h1 class="hero-title">
+      <span class="dev">Dev</span><span class="os">OS</span>
+    </h1>
+
+    <p class="hero-sub">
+      <strong>Arch Linux for developers</strong> who want everything working on day one.
+      XFCE desktop, LTS kernel, GUI installer, and full Apple MacBook support — out of the box.
+    </p>
+
+    <div class="hero-ctas">
+      <a class="btn-glow" href="#preview">
+        ▶  Live Installer Preview
+      </a>
+      <a class="btn-glass" href="https://github.com/SalDevX/devos#build-the-iso" target="_blank">
+        Build the ISO  →
+      </a>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="anim-frame">
+        <img src="installer-animation.svg" alt="DevOS installer animated walkthrough"/>
+        <div class="anim-bar">
+          <span class="anim-bar-label">calamares · systemd-boot · ext4 · linux-lts · xfce4</span>
+          <a href="installer-preview.html">Open full preview →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS ── -->
+  <section class="stats reveal">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-n">470</div>
+        <div class="stat-l">Repo Packages</div>
+        <div class="stat-s">official Arch repos</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-n">115</div>
+        <div class="stat-l">AUR Packages</div>
+        <div class="stat-s">brave, calamares, xfdashboard…</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-n">6</div>
+        <div class="stat-l">DKMS Modules</div>
+        <div class="stat-s">broadcom-wl, magicmouse, facetimehd…</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-n">17</div>
+        <div class="stat-l">System Services</div>
+        <div class="stat-s">custom systemd units</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-n">LTS</div>
+        <div class="stat-l">Kernel</div>
+        <div class="stat-s">linux-lts · stable & supported</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-n">∞</div>
+        <div class="stat-l">Rolling</div>
+        <div class="stat-s">always up to date</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="features" id="features">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">What you get</p>
+      <h2 class="section-title">Everything configured.<br/>Nothing left to guess.</h2>
+      <p class="section-sub">A full developer environment, not a bare Arch install.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🖥</div>
+        <h3 class="feat-title">XFCE 4 Desktop</h3>
+        <p class="feat-desc">Composited with picom, xfdashboard overview on 4-finger swipe, Plank dock, WhiteSur-Light theme with Gruvbox-Plus-Dark icons. Fast, clean, and distraction-free.</p>
+        <div class="feat-chips">
+          <span class="chip">xfce4</span>
+          <span class="chip">plank</span>
+          <span class="chip">xfdashboard</span>
+          <span class="chip">picom</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🍎</div>
+        <h3 class="feat-title">Apple MacBook Ready</h3>
+        <p class="feat-desc">Broadcom WiFi, Magic Trackpad 2, FaceTime HD camera, fan control, lid/clamshell handling, battery alerts — all working at first boot. No manual driver setup.</p>
+        <div class="feat-chips">
+          <span class="chip">broadcom-wl</span>
+          <span class="chip">hid-magicmouse</span>
+          <span class="chip">facetimehd</span>
+          <span class="chip">mbpfan</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🛠</div>
+        <h3 class="feat-title">Dev Toolchain</h3>
+        <p class="feat-desc">Brave, VS Code, Docker, Node 20, Python 3.14, Git, GitHub CLI, Paru AUR helper, PlatformIO. Real-time priority limits pre-configured for audio/embedded work.</p>
+        <div class="feat-chips">
+          <span class="chip">brave</span>
+          <span class="chip">vscode</span>
+          <span class="chip">docker</span>
+          <span class="chip">node 20</span>
+          <span class="chip">paru</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🔒</div>
+        <h3 class="feat-title">Security First</h3>
+        <p class="feat-desc">Root locked, sudo via wheel only, UFW firewall, fail2ban, sshd off by default. Live password expires on first login — forces you to set a real one immediately.</p>
+        <div class="feat-chips">
+          <span class="chip">ufw</span>
+          <span class="chip">fail2ban</span>
+          <span class="chip">wheel-only sudo</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">📦</div>
+        <h3 class="feat-title">GUI Installer</h3>
+        <p class="feat-desc">Calamares installer with full DevOS branding. Click through location, keyboard, partitions, and user setup. Systemd-boot configured automatically. No terminal required.</p>
+        <div class="feat-chips">
+          <span class="chip">calamares</span>
+          <span class="chip">systemd-boot</span>
+          <span class="chip">GPT · ext4</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🐚</div>
+        <h3 class="feat-title">Power Shell</h3>
+        <p class="feat-desc">Alacritty → tmux → zsh with Powerlevel10k. Word navigation, syntax highlighting, smart history. libinput-gestures for trackpad-driven workspace switching.</p>
+        <div class="feat-chips">
+          <span class="chip">zsh</span>
+          <span class="chip">p10k</span>
+          <span class="chip">tmux</span>
+          <span class="chip">alacritty</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── INSTALLER PREVIEW ── -->
+  <section class="preview-section" id="preview">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Interactive Demo</p>
+      <h2 class="section-title">Try the installer<br/>before you install.</h2>
+      <p class="section-sub">Click through the full Calamares GUI experience — no VM needed.</p>
+    </div>
+
+    <div class="preview-inner reveal">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="b-dots">
+            <div class="b-dot r"></div>
+            <div class="b-dot y"></div>
+            <div class="b-dot g"></div>
+          </div>
+          <div class="b-url">saldevx.github.io/devos/installer-preview.html</div>
+          <a class="b-open" href="installer-preview.html" target="_blank">Open ↗</a>
+        </div>
+        <iframe
+          src="installer-preview.html"
+          title="DevOS Installer Preview"
+          loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── MACBOOK COMPAT ── -->
+  <section class="compat-section" id="macbook">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Apple MacBook</p>
+      <h2 class="section-title">Every piece of hardware.<br/>Supported.</h2>
+    </div>
+
+    <div class="compat-inner reveal">
+      <table class="compat-table">
+        <thead>
+          <tr>
+            <th>Hardware</th>
+            <th>Driver / Method</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Broadcom BCM WiFi</td><td>broadcom-wl DKMS · conflicting drivers blacklisted</td><td>✅</td></tr>
+          <tr><td>Intel Iris Pro / HD</td><td>xf86-video-intel · TearFree · DRI3</td><td>✅</td></tr>
+          <tr><td>Magic Trackpad 2</td><td>hid-magicmouse DKMS · libinput pressure curves</td><td>✅</td></tr>
+          <tr><td>Magic Mouse 2</td><td>hid-magicmouse DKMS · udev acceleration tuning</td><td>✅</td></tr>
+          <tr><td>FaceTime HD Camera</td><td>facetimehd DKMS</td><td>✅</td></tr>
+          <tr><td>Thunderbolt 2</td><td>Native kernel support</td><td>✅</td></tr>
+          <tr><td>Fan / Thermal</td><td>mbpfan service</td><td>✅</td></tr>
+          <tr><td>Built-in Display Audio</td><td>Disabled at boot · prevents HDMI conflicts</td><td>✅</td></tr>
+          <tr><td>USB SuperDrive</td><td>udev rule 91-apple-superdrive.rules</td><td>✅</td></tr>
+          <tr><td>Clamshell / Lid</td><td>acpid handler · logind defer · external display handoff</td><td>✅</td></tr>
+          <tr><td>Battery Alerts</td><td>systemd user timer</td><td>✅</td></tr>
+          <tr><td>Suspend / Resume</td><td>acpid + tlp</td><td>✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">
+      <span>Dev</span><span>OS</span>
+    </div>
+    <nav class="footer-links">
+      <a href="https://github.com/SalDevX/devos" target="_blank">GitHub</a>
+      <a href="https://github.com/SalDevX/devos/blob/master/packages.x86_64" target="_blank">Packages</a>
+      <a href="installer-preview.html">Installer Preview</a>
+      <a href="https://github.com/SalDevX/devos#build-the-iso" target="_blank">Build from Source</a>
+      <a href="https://wiki.archlinux.org" target="_blank">Arch Wiki</a>
+      <a href="https://github.com/SalDevX/devos/blob/master/LICENSE" target="_blank">MIT License</a>
+    </nav>
+    <p class="footer-copy">
+      Built on <a href="https://archlinux.org" target="_blank" style="color:var(--blue);text-decoration:none">Arch Linux</a> ·
+      Assembled with archiso · Installed by Calamares
+    </p>
+  </footer>
+
+</div>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
 </html>
