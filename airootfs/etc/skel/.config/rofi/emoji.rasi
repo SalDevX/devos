@@ -1,0 +1,6 @@
+configuration {
+    layout: "grid";  /* Change layout only for emoji mode */
+    font: "Noto Color Emoji 14"; /* Ensure emoji display properly */
+    show-icons: true;
+}
+@theme "/home/craftworkson/.config/rofi/emoji.rasi"

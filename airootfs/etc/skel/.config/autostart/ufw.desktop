@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=UFW Firewall
+Comment=Start Uncomplicated Firewall
+Exec=sudo ufw enable
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+X-XFCE-Autostart-enabled=true

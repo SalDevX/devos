@@ -17,6 +17,11 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt EXTENDED_HISTORY       # save timestamp + duration
 
+# ────────────── DIRECTORY STACK ──────────────
+setopt AUTO_PUSHD             # every cd pushes to stack
+setopt PUSHD_IGNORE_DUPS      # no duplicates in stack
+setopt PUSHD_SILENT           # don't print stack on cd
+
 # ────────────── COMPLETION ──────────────
 autoload -Uz compinit
 compinit -d "${XDG_CACHE_HOME}/zcompdump-${ZSH_VERSION}"
@@ -101,10 +106,17 @@ eval "$(direnv hook zsh)"
 bindkey '^R' fzf-history-widget   # override default with fzf
 
 # ────────────── ALIASES — Navigation ──────────────
-alias ll='ls -la'
-alias lsh='ls | pr -T -w $(tput cols) -3'
+alias ls='eza --color=always --group-directories-first'
+alias ll='eza -la --icons --git --group-directories-first'
+alias la='eza -a --icons --group-directories-first'
+alias lt='eza --tree --icons --level=2'
+alias lsh='eza --color=always --group-directories-first --across'
 alias duh='du -sh -- * 2>/dev/null | pr -T -w $(tput cols) -3'
 alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias -- -='cd -'          # go back to previous dir
 
 # ────────────── ALIASES — Zsh ──────────────
 alias zshconfig="nvim ~/.zshrc"

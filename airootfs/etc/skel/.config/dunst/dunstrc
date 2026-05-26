@@ -1,0 +1,149 @@
+[global]
+    monitor = 0
+    follow = none
+    width = (0, 300)
+    height = (0, 300)
+    origin = bottom-center
+    offset = (0, 50)
+    scale = 0
+    notification_limit = 1
+    progress_bar = true
+    progress_bar_height = 12
+    progress_bar_frame_width = 0
+    progress_bar_min_width = 150
+    progress_bar_max_width = 300
+    progress_bar_corner_radius = 6
+    progress_bar_corners = all
+    indicate_hidden = no
+    transparency = 5
+    separator_height = 2
+    padding = 8
+    horizontal_padding = 8
+    text_icon_padding = 0
+    frame_width = 0
+    frame_color = "#89b4fa"
+    highlight = "#00FF8036"
+    gap_size = 0
+    separator_color = frame
+    sort = yes
+    font = Noto Sans 11
+    line_height = 0
+    markup = full
+    format = "<b>%s</b>\n%b\n%p"
+    alignment = center
+    vertical_alignment = center
+    show_age_threshold = 60
+    ellipsize = middle
+    ignore_newline = no
+    stack_duplicates = true
+    hide_duplicate_count = true
+    show_indicators = yes
+    enable_recursive_icon_lookup = false
+    icon_theme = Gruvbox-Plus-Dark, Papirus, Adwaita, hicolor, WhiteSur-dark
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 128
+    icon_path = /home/craftworkson/.icons/dunst:/usr/share/icons/Gruvbox-Plus-Dark:/usr/share/icons/Papirus:/usr/share/icons/hicolor:/usr/share/pixmaps
+    sticky_history = yes
+    history_length = 20
+    dmenu = /usr/bin/dmenu -p dunst:
+    browser = /usr/bin/xdg-open
+    always_run_script = true
+    title = Dunst
+    class = Dunst
+    corner_radius = 15
+    corners = all
+    ignore_dbusclose = false
+    force_xwayland = false
+    force_xinerama = false
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+[experimental]
+    per_monitor_dpi = true
+[volume_notify]
+appname = "volume"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[xfce_volume_notify]
+appname = "Xfce volume control"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 555
+[xfce_brightness_notify]
+appname = "xfce4-power-manager"
+icon = ".*display-brightness.*"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[xfce_kbd_brightness_notify]
+appname = "xfce4-power-manager"
+icon = ".*keyboard-brightness.*"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[xfce_power_manager_fallback]
+appname = "xfce4-power-manager"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[keyboard_backlight_notify]
+appname = "kbd-brightness"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[brightness_notify]
+appname = "brightness"
+format = " "
+icon_position = top
+background = "#fafafa32"
+foreground = "#757575"
+timeout = 1000
+[urgency_low]
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 1
+[urgency_normal]
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 1
+    override_pause_level = 30
+    default_icon = dialog-information
+[urgency_critical]
+    background = "#352B41"
+    foreground = "#ffffff"
+    frame_color = "#550A35"
+    timeout = 0
+    override_pause_level = 60
+    default_icon = dialog-warning
+[workspace]
+appname = Workspace
+timeout = 1
+background = "#fafafa32"
+foreground = "#757575"
+match_transient = yes
+set_transient = yes
+stack_tag = "workspace"
+    match_transient = yes
+   set_transient = yes
+  set_stack_tag = "volume"
+ 
+
+
+
+
+
+

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=thunar --daemon
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+Name=Thunar Daemon
+Comment=Start Thunar in daemon mode to handle desktop files
+RunHook=0
+
