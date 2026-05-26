@@ -1,4 +1,5 @@
-# --- priority: browser, desktop shell, gestures, fonts, shell/term ---
+# --- priority: installer, browser, desktop shell, gestures, fonts, shell/term ---
+calamares
 brave-bin
 xfdashboard
 libinput-gestures
@@ -33,6 +34,7 @@ electron39-bin
 faba-icon-theme
 flyctl-bin
 gruvbox-plus-icon-theme-git
+whitesur-gtk-theme
 gtk2
 gtk-cyberpunk-neon-theme-git
 gtk-engine-murrine

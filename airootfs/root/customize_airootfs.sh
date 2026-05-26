@@ -78,6 +78,27 @@ systemctl --global enable libinput-gestures.service >/dev/null 2>&1 || true
 systemctl enable devos-firstboot.service >/dev/null 2>&1 || true
 
 # ----------------------------------------------------------------------
+# Live ISO: Install DevOS desktop shortcut for the live user only.
+# Goes directly into /home/user — NOT into /etc/skel — so the installed
+# system never inherits it. The cleanup.sh Calamares step removes it
+# from /mnt if it somehow ends up there.
+# ----------------------------------------------------------------------
+mkdir -p /home/user/Desktop
+cat > /home/user/Desktop/install-devos.desktop << 'EOF'
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Install DevOS
+Comment=Install DevOS to your disk
+Exec=pkexec calamares
+Icon=calamares
+Terminal=false
+Categories=System;
+EOF
+chmod +x /home/user/Desktop/install-devos.desktop
+chown -R user:user /home/user/Desktop
+
+# ----------------------------------------------------------------------
 # Regenerate initramfs if a kernel is present in the image.
 # ----------------------------------------------------------------------
 command -v mkinitcpio >/dev/null && mkinitcpio -P || true

@@ -1,0 +1,31 @@
+componentName: devos
+
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+
+strings:
+    productName:         DevOS
+    shortProductName:    DevOS
+    version:             Rolling
+    shortVersion:        Rolling
+    versionedName:       DevOS (Rolling)
+    shortVersionedName:  DevOS
+    bootloaderEntryName: DevOS
+    productUrl:          https://github.com/craftworkson/devos
+    supportUrl:          https://wiki.archlinux.org
+    knownIssuesUrl:      https://github.com/craftworkson/devos/issues
+    releaseNotesUrl:     https://github.com/craftworkson/devos/releases
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "welcome.png"
+
+slideshow:               "show.qml"
+slideshowAPI:            2
+
+style:
+    sidebarBackground:    "#1d2021"
+    sidebarText:          "#ebdbb2"
+    sidebarTextSelect:    "#d79921"
+    sidebarTextHighlight: "#d79921"
