@@ -24,8 +24,9 @@ REPO_NAME="devos-local"
 FORCE=0; ARGS=()
 for a in "$@"; do [[ "$a" == --force ]] && FORCE=1 || ARGS+=("$a"); done
 REPO_DIR="${ARGS[0]:-$HOME/devos-local}"
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 LIST="$ROOT/aur-build-list.txt"
+echo "[build-aur-repo] list: $LIST"
 SRC="$REPO_DIR/.src"
 SUCCESS_LOG="$REPO_DIR/build-success.log"
 FAIL_LOG="$REPO_DIR/build-failed.log"
