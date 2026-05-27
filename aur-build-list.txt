@@ -23,12 +23,6 @@ ccze                            # Log file colorizer
 cfonts                          # Colourful ASCII art font renderer
 neofetch                        # System info display with ASCII art logo
 
-# --- App Menu (Global Menu) --------------------------------------------------
-# Build order: appmenu-glib-translator → vala-panel-appmenu-registrar → vala-panel-appmenu-xfce
-accounts-qml-module             # QML accounts integration (calamares user setup dep)
-appmenu-glib-translator         # GLib menu model translator (vala-panel dep)
-vala-panel-appmenu-registrar    # Global menu D-Bus registrar daemon
-vala-panel-appmenu-xfce         # Global app menu panel plugin for XFCE
 
 # --- Themes & Icons ----------------------------------------------------------
 arc-gtk-theme                   # Arc GTK theme (flat, dark/light variants)
@@ -84,7 +78,6 @@ libjpeg6-turbo                  # libjpeg 6 — for apps requiring libjpeg.so.6
 
 # --- C/C++ Libraries (build/runtime deps) ------------------------------------
 imgui                           # Dear ImGui immediate-mode GUI library (C++)
-libxlsxwriter                   # C library for writing Excel .xlsx files
 magic_enum                      # C++ static enum reflection (header-only)
 reproc                          # C/C++ process management library
 libuvc                          # USB Video Class library (webcam support)
