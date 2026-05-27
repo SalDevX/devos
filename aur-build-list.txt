@@ -46,7 +46,6 @@ menulibre                       # Freedesktop menu editor (.desktop files)
 # --- System / Hardware / MacBook ---------------------------------------------
 mbpfan                          # MacBook fan speed control daemon (temperature-based)
 ch34x-dkms-git                  # USB-serial driver for CH34x chips (cheap Arduinos)
-v4l2loopback-dc-dkms            # Virtual V4L2 video device (virtual camera support)
 hfsprogs                        # HFS+ filesystem tools (read/write macOS drives)
 cpuid                           # CPU identification and feature flags tool
 i7z                             # Intel i7/i5/i3 real-time CPU frequency reporter
