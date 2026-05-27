@@ -16,7 +16,7 @@
 #   so re-running only builds what's missing or previously failed.
 #
 #   NOTE: a plain makepkg loop does not resolve AUR->AUR dependencies. Failures are
-#   logged; a second run (after enabling the repo) usually clears them. paru one-liner
+#   logged; a second run (after enabling the repo) usually clears them. yay one-liner
 #   is printed at the end as the easy alternative.
 set -uo pipefail
 
@@ -88,5 +88,5 @@ Next:
   3) Re-run to retry failures (built packages are skipped automatically).
 
 AUR deps not resolving in the loop? Easy path:
-  paru -S --noconfirm \$(grep -vE '^#|^\$' "${LIST}")
+  yay -S --noconfirm \$(grep -vE '^#|^\$' "${LIST}")
 EOF

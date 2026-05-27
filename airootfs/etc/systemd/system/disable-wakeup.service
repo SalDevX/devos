@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable USB/lid ACPI wakeup sources before sleep
+# NOTE: XHC1 (USB) and LID0 are hardware-specific ACPI node names; verify with
+# `cat /proc/acpi/wakeup` and adjust for your machine.
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "echo XHC1 > /proc/acpi/wakeup; echo LID0 > /proc/acpi/wakeup"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sleep.target

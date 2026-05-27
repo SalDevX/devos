@@ -33,6 +33,7 @@ ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 # demo, but it is EXPIRED (chage -d 0) so an installed system forces a change at
 # first login. Root login is LOCKED (use sudo).
 # ----------------------------------------------------------------------
+chown -R root:root /etc/skel
 useradd -m -s /usr/bin/zsh user 2>/dev/null || true
 for g in wheel audio video input render; do   # docker + realtime dropped (see README / MusicOS)
   groupadd -f "$g"

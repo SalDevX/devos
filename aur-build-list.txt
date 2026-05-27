@@ -1,117 +1,92 @@
-# --- priority: installer, browser, desktop shell, gestures, fonts, shell/term ---
-calamares
-brave-bin
-xfdashboard
-libinput-gestures
-ttf-ms-fonts
-zsh-theme-powerlevel10k
-mdcat
-tiv
-ccze
-cfonts
-neofetch
-# --- remainder (alphabetical) ---
-accounts-qml-module
-appmenu-glib-translator
-arc-gtk-theme
-archlinux-themes-slim
-arc-icon-theme
-ayatana-indicator-application
-bastet
-bdf-unifont
-bless
-cctv-viewer-git
-cdbus-git
-ch34x-dkms-git
-clutter
-clutter-gst
-clutter-gtk
-cogl
-cpuid
-digital-git
-dunst-git
-electron39-bin
-faba-icon-theme
-flyctl-bin
-gruvbox-plus-icon-theme-git
-whitesur-gtk-theme
-gtk2
-gtk-cyberpunk-neon-theme-git
-gtk-engine-murrine
-gtkmm
-gtk-sharp-2
-gtypist-git
-hfsprogs
-http-parser
-i7z
-icu66-bin
-imgui
-libart-lgpl
-libchamplain
-libdbusmenu-gtk2
-libffi7
-libglade
-libgnomecanvas
-libgnomecanvasmm
-libjpeg6-turbo
-libuvc
-libwnck
-libxlsxwriter
-lxdm-themes
-magic_enum
-markdown2pdf-git
-masterpdfeditor-free
-matchbox-keyboard
-mbpfan
-mcos-mjv-xfce-edition
-menulibre
-mnemosyne
-moka-icon-theme-git
-nafe
-nsnake
-ocrmypdf
-ookla-speedtest-bin
-openssl-1.1
-oranchelo-icon-theme-git
-pacman4console
-paru-bin
-playwright
-platformio-git
-powerstat
-prot16-xfce4-terminal
-psximager-git
-python312
-python-asgi-lifespan
-python-async-timeout
-python-backports-zstd
-python-click-option-group
-python-fpdf2
-python-httpx-sse
-python-openapi-pydantic
-python-opentelemetry-instrumentation
-python-opentelemetry-instrumentation-requests
-python-opentelemetry-instrumentation-threading
-python-opentelemetry-util-http
-python-sphinxcontrib-svg2pdfconverter
-python-sse-starlette
-python-uncalled-for
-qt5-3d
-qt5-sensors
-qt5-styleplugins
-reproc
-spell
-urw
-usbmon
-v4l2loopback-dc-dkms
-vala-panel-appmenu-registrar
-vala-panel-appmenu-xfce
-vieb
-visual-studio-code-bin
-voikko-fi
-voikko-libreoffice
-webkit2gtk
-wkhtmltopdf-static
-xfce4-artwork
-xfwm4-themes
-xruncounter-git
-yay
+# =============================================================================
+# DevOS AUR build list — built by devos/tools/build-aur-repo.sh
+# All packages here are AUR-only (not in official repos).
+# Build order matters: deps must appear before dependents.
+# =============================================================================
+
+# --- Installer deps (build first — calamares depends on webkit2gtk) ----------
+webkit2gtk                      # WebKit2 GTK 4.0 API — older version; calamares dep
+calamares                       # GUI graphical installer
+
+# --- Browser -----------------------------------------------------------------
+brave-bin                       # Brave browser — prebuilt binary release
+
+# --- Desktop Shell & Gestures ------------------------------------------------
+xfdashboard                     # XFCE Exposé-style overview / app switcher
+libinput-gestures               # Touchpad multi-touch gesture daemon (MacBook)
+zsh-theme-powerlevel10k         # Powerlevel10k — fast, feature-rich zsh prompt
+
+# --- CLI / Terminal Tools ----------------------------------------------------
+mdcat                           # Render Markdown with images in the terminal
+tiv                             # Terminal image viewer
+ccze                            # Log file colorizer
+cfonts                          # Colourful ASCII art font renderer
+neofetch                        # System info display with ASCII art logo
+
+# --- App Menu (Global Menu) --------------------------------------------------
+# Build order: appmenu-glib-translator → vala-panel-appmenu-registrar → vala-panel-appmenu-xfce
+accounts-qml-module             # QML accounts integration (calamares user setup dep)
+appmenu-glib-translator         # GLib menu model translator (vala-panel dep)
+vala-panel-appmenu-registrar    # Global menu D-Bus registrar daemon
+vala-panel-appmenu-xfce         # Global app menu panel plugin for XFCE
+
+# --- Themes & Icons ----------------------------------------------------------
+arc-gtk-theme                   # Arc GTK theme (flat, dark/light variants)
+arc-icon-theme                  # Arc icon theme (matches Arc GTK theme)
+gruvbox-plus-icon-theme-git     # Gruvbox Plus icon theme (warm retro palette)
+whitesur-gtk-theme              # macOS Big Sur / WhiteSur GTK theme
+mcos-mjv-xfce-edition           # macOS-style XFCE layout and config theme
+moka-icon-theme-git             # Moka icon theme (clean, rounded)
+prot16-xfce4-terminal           # Prot16 terminal colour scheme collection
+xfce4-artwork                   # DevOS custom XFCE wallpapers and artwork
+xfwm4-themes                    # Extra window decoration themes for xfwm4
+
+# --- Fonts (AUR) -------------------------------------------------------------
+ttf-ms-fonts                    # Microsoft core fonts: Arial, Times New Roman, etc.
+bdf-unifont                     # GNU Unifont BDF format (calamares installer font)
+urw                             # URW++ font collection (PDF/print quality)
+
+# --- XFCE Extras -------------------------------------------------------------
+menulibre                       # Freedesktop menu editor (.desktop files)
+
+# --- System / Hardware / MacBook ---------------------------------------------
+mbpfan                          # MacBook fan speed control daemon (temperature-based)
+ch34x-dkms-git                  # USB-serial driver for CH34x chips (cheap Arduinos)
+v4l2loopback-dc-dkms            # Virtual V4L2 video device (virtual camera support)
+hfsprogs                        # HFS+ filesystem tools (read/write macOS drives)
+cpuid                           # CPU identification and feature flags tool
+i7z                             # Intel i7/i5/i3 real-time CPU frequency reporter
+usbmon                          # USB bus traffic monitoring tool
+
+# --- Developer Tools ---------------------------------------------------------
+visual-studio-code-bin          # VS Code — prebuilt binary release
+yay                             # Yet Another Yogurt — AUR helper
+ookla-speedtest-bin             # Official Ookla Speedtest CLI
+powerstat                       # System power consumption measurement tool
+cdbus-git                       # D-Bus C++ binding library (indicator stack dep)
+
+# --- GTK Legacy Stack --------------------------------------------------------
+# These older GTK runtimes are required by apps and themes that predate GTK3/4.
+gtk2                            # GTK+ 2.x runtime (legacy apps and GTK2 themes)
+gtk-engine-murrine              # GTK2 Murrine theme engine (many themes depend on it)
+gtkmm                           # C++ bindings for GTK2 (older gtkmm 2.4 API)
+libglade                        # Glade XML UI loader (GTK2-era UI files)
+libdbusmenu-gtk2                # DBusMenu GTK2 (global menu for GTK2 apps)
+libwnck                         # Window Navigator Construction Kit (older API)
+libchamplain                    # Map/tile rendering widget library
+
+# --- Legacy ABI Compatibility Libraries --------------------------------------
+# Prebuilt binaries that require specific older .so versions not in current Arch.
+icu66-bin                       # ICU 66 — for apps linked against libicuXX.so.66
+libffi7                         # libffi 7.x — for apps linked against libffi.so.7
+openssl-1.1                     # OpenSSL 1.1.x — for apps linked against libssl.so.1.1
+libjpeg6-turbo                  # libjpeg 6 — for apps requiring libjpeg.so.6
+
+# --- C/C++ Libraries (build/runtime deps) ------------------------------------
+imgui                           # Dear ImGui immediate-mode GUI library (C++)
+libxlsxwriter                   # C library for writing Excel .xlsx files
+magic_enum                      # C++ static enum reflection (header-only)
+reproc                          # C/C++ process management library
+libuvc                          # USB Video Class library (webcam support)
+
+spell                           # Ispell spell checker

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=DevOS
+Description=DevOS boot splash — macOS style, dark, logo + progress bar
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/devos
+ScriptFile=/usr/share/plymouth/themes/devos/devos.script

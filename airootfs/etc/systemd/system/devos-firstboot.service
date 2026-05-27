@@ -1,0 +1,12 @@
+[Unit]
+Description=DevOS first-boot setup (enables Apple/Intel services on the real machine)
+ConditionPathExists=!/var/lib/devos/firstboot-done
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/devos-firstboot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

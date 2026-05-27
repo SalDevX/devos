@@ -1,0 +1,11 @@
+[Unit]
+Description=Disable USB autosuspend
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo -1 > /sys/module/usbcore/parameters/autosuspend'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=daw.target

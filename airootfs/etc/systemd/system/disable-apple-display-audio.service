@@ -1,0 +1,12 @@
+[Unit]
+Description=Disable Apple Display USB Audio
+After=systemd-udevd.service
+Before=daw.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/disable-apple-display-audio.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=daw.target

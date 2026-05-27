@@ -1,0 +1,5 @@
+[Unit]
+Description=DAW Mode — low-latency audio, isolated from network/bluetooth
+Documentation=man:systemd.special(7)
+Conflicts=NetworkManager.service bluetooth.service pipewire.service wireplumber.service
+After=multi-user.target

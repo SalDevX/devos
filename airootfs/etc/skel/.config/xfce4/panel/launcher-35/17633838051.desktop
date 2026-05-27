@@ -2,8 +2,8 @@
 Version=1.0
 Type=Application
 Name=Toggle Disable While Typing
-Comment=bash -lc "/home/craftworkson/bin/toggle-dwt-panel.py"\n
-Exec=/home/craftworkson/bin/toggle-disable-while-typing.py
+Comment=bash -lc "/usr/local/bin/toggle-dwt-panel.py"\n
+Exec=/usr/local/bin/toggle-disable-while-typing.py
 Icon=input-touchpad
 Path=
 Terminal=false

@@ -43,7 +43,7 @@
     icon_position = left
     min_icon_size = 32
     max_icon_size = 128
-    icon_path = /home/craftworkson/.icons/dunst:/usr/share/icons/Gruvbox-Plus-Dark:/usr/share/icons/Papirus:/usr/share/icons/hicolor:/usr/share/pixmaps
+    icon_path = /usr/share/icons/Gruvbox-Plus-Dark:/usr/share/icons/Papirus:/usr/share/icons/hicolor:/usr/share/pixmaps
     sticky_history = yes
     history_length = 20
     dmenu = /usr/bin/dmenu -p dunst:

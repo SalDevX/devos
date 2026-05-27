@@ -1,0 +1,56 @@
+// DevOS Plymouth Theme — macOS style
+// Black background · centered logo · thin white progress bar
+
+screen_width  = Window.GetWidth();
+screen_height = Window.GetHeight();
+
+// --- Background ---
+Window.SetBackgroundTopColor(0.051, 0.051, 0.051);     // #0d0d0d
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+// --- Logo ---
+logo_image = Image("logo.png");
+logo_natural_w = logo_image.GetWidth();
+logo_natural_h = logo_image.GetHeight();
+
+// Scale to ~15% of screen height, keep aspect ratio
+logo_scale = screen_height * 0.15 / logo_natural_h;
+logo_w = Math.Round(logo_natural_w * logo_scale);
+logo_h = Math.Round(logo_natural_h * logo_scale);
+
+logo_scaled = logo_image.Scale(logo_w, logo_h);
+logo_sprite = Sprite(logo_scaled);
+logo_sprite.SetPosition(
+    Math.Round((screen_width  - logo_w) / 2),
+    Math.Round(screen_height  * 0.42 - logo_h / 2),
+    1
+);
+
+// --- Progress bar geometry (macOS: centered, 40% wide, 4px tall, ~72% down) ---
+bar_width  = Math.Round(screen_width * 0.40);
+bar_height = 4;
+bar_x      = Math.Round((screen_width - bar_width) / 2);
+bar_y      = Math.Round(screen_height * 0.72);
+
+// Track
+track_img    = Image("progress_bar_bg.png");
+track_sprite = Sprite(track_img.Scale(bar_width, bar_height));
+track_sprite.SetPosition(bar_x, bar_y, 2);
+
+// Fill — starts at 1px wide, grows with progress
+fill_img    = Image("progress_bar_fg.png");
+fill_sprite = Sprite(fill_img.Scale(1, bar_height));
+fill_sprite.SetPosition(bar_x, bar_y, 3);
+
+// --- Callbacks ---
+fun ProgressCallback(duration, progress) {
+    new_w = Math.Max(1, Math.Round(bar_width * progress));
+    fill_sprite.SetImage(fill_img.Scale(new_w, bar_height));
+}
+
+fun RefreshCallback() {
+    // no animation needed — static logo, deterministic bar
+}
+
+Plymouth.SetBootProgressFunction(ProgressCallback);
+Plymouth.SetRefreshFunction(RefreshCallback);

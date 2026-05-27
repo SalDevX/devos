@@ -23,5 +23,15 @@ if is_intel; then
   systemctl enable --now thermald.service 2>/dev/null || true
 fi
 
+# Wire firejail to intercept all supported apps via symlinks in /usr/local/bin
+firecfg 2>/dev/null || true
+# Brave has its own security model — remove it from firejail interception
+rm -f /usr/local/bin/brave-browser-stable \
+      /usr/local/bin/brave-browser \
+      /usr/local/bin/brave-browser-beta \
+      /usr/local/bin/brave-browser-dev \
+      /usr/local/bin/brave-browser-nightly \
+      /usr/local/bin/brave 2>/dev/null || true
+
 touch "$STAMP"
 systemctl disable devos-firstboot.service 2>/dev/null || true
