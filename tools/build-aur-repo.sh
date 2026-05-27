@@ -61,7 +61,8 @@ while IFS= read -r line; do
     fi
   fi
 
-  if ( cd "$SRC/$pkg" && makepkg -s --noconfirm --needed ) >/dev/null 2>&1; then
+  MKPKG_EXTRA=(); (( FORCE )) && MKPKG_EXTRA=(--force --clean)
+  if ( cd "$SRC/$pkg" && makepkg -s --noconfirm --needed "${MKPKG_EXTRA[@]}" ) >/dev/null 2>&1; then
     if cp "$SRC/$pkg"/*.pkg.tar.zst "$REPO_DIR"/ 2>/dev/null; then
       echo "$(ts)  $pkg" >> "$SUCCESS_LOG"; printf '%s\n' "$pkg" >> "$BUILT"; ((ok++)); echo "   ok"
     else
