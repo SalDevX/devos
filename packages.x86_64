@@ -3,281 +3,281 @@
 # =============================================================================
 
 # --- Base System -------------------------------------------------------------
-base                            # Arch Linux base meta-package
-base-devel                      # Build toolchain: gcc, make, binutils, etc.
-linux-lts                       # LTS kernel (preferred over mainline for stability)
-linux-lts-headers               # Kernel headers — required for DKMS modules
-linux-firmware                  # Hardware firmware blobs
-intel-ucode                     # Intel CPU microcode (security + stability updates)
-gcc-libs                        # GCC runtime libraries
+base
+base-devel
+linux-lts
+linux-lts-headers
+linux-firmware
+intel-ucode
+gcc-libs
 
 # --- Boot --------------------------------------------------------------------
-grub                            # GRUB bootloader (BIOS + UEFI fallback)
-efibootmgr                      # Manage UEFI boot entries
-syslinux                        # BIOS syslinux for archiso live boot
-mkinitcpio-archiso              # archiso initcpio hook — required for ISO boot
-archiso                         # Arch ISO build tooling (live environment)
-plymouth                        # Boot splash screen with progress bar
-mokutil                         # Secure Boot MOK key enrollment
+grub
+efibootmgr
+syslinux
+mkinitcpio-archiso
+archiso
+plymouth
+mokutil
 
 # --- Shell & Terminal --------------------------------------------------------
-zsh                             # Z shell (default shell)
-zsh-autosuggestions             # Fish-style command history suggestions
-zsh-syntax-highlighting         # Real-time command syntax highlighting
-bash-completion                 # Tab completion for bash scripts
-alacritty                       # GPU-accelerated terminal emulator
-tmux                            # Terminal multiplexer (sessions, splits)
-direnv                          # Per-directory environment variable loader
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+bash-completion
+alacritty
+tmux
+direnv
 
 # --- CLI Utilities -----------------------------------------------------------
-bat                             # cat with syntax highlighting and line numbers
-bc                              # Arbitrary precision calculator
-eza                             # Modern ls replacement (icons, git status)
-fd                              # Fast, user-friendly find alternative
-fzf                             # Fuzzy finder (files, history, anything)
-glow                            # Render Markdown in the terminal
-less                            # Pager
-ncdu                            # NCurses interactive disk usage viewer
-plocate                         # Fast file locator (mlocate replacement)
-pkgfile                         # Find which package owns a given file
-pv                              # Pipe viewer — progress bar for pipelines
-ripgrep                         # Fast recursive grep (respects .gitignore)
-tree                            # Recursive directory tree display
-wget                            # File downloader
-whois                           # WHOIS domain/IP lookup
-yazi                            # TUI file manager with image preview
-ueberzugpp                      # Terminal image overlay (yazi dep)
-7zip                            # Multi-format archive tool (7z, zip, tar…)
-zip                             # ZIP compression
-unzip                           # ZIP extraction
-xarchiver                       # GUI archive manager (Thunar integration)
-dos2unix                        # Convert Windows CRLF line endings to LF
-dialog                          # Shell script dialog boxes (used by installers)
-inetutils                       # Basic network tools: hostname, ftp, telnet
-net-tools                       # Legacy network tools: ifconfig, netstat, route
-strace                          # System call tracer (debugging)
-xsel                            # X clipboard read/write from CLI
+bat
+bc
+eza
+fd
+fzf
+glow
+less
+ncdu
+plocate
+pkgfile
+pv
+ripgrep
+tree
+wget
+whois
+yazi
+ueberzugpp
+7zip
+zip
+unzip
+xarchiver
+dos2unix
+dialog
+inetutils
+net-tools
+strace
+xsel
 
 # --- Text Editors ------------------------------------------------------------
-neovim                          # Hyperextensible Vim-based editor
-vim                             # Vi IMproved text editor
-nano                            # Simple terminal text editor
+neovim
+vim
+nano
 
 # --- System Monitoring -------------------------------------------------------
-htop                            # Interactive process viewer
-btop                            # Resource monitor (CPU, mem, net, disk)
-fastfetch                       # Fast system info display (neofetch-style)
-inxi                            # Full system information report
-dmidecode                       # Read DMI/SMBIOS hardware info
-lshw                            # Detailed hardware lister
-acpi                            # ACPI battery/thermal info CLI
-acpid                           # ACPI event daemon (lid close, power button)
-smartmontools                   # Drive health monitoring (S.M.A.R.T.)
-powertop                        # Intel power consumption analyser
-nethogs                         # Per-process network bandwidth monitor
-tcpdump                         # CLI packet capture and analysis
+htop
+btop
+fastfetch
+inxi
+dmidecode
+lshw
+acpi
+acpid
+smartmontools
+powertop
+nethogs
+tcpdump
 
 # --- Network -----------------------------------------------------------------
-networkmanager                  # Network connection manager
-network-manager-applet          # NM system tray applet
-networkmanager-openvpn          # OpenVPN plugin for NetworkManager
-nss-mdns                        # mDNS/Bonjour name resolution
-nmap                            # Network scanner and port mapper
-mtr                             # Network diagnostic: traceroute + ping combined
-bind                            # DNS tools: dig, nslookup, host
-wireless-regdb                  # Wireless regulatory domain database
-iptables                        # Netfilter firewall rules
+networkmanager
+network-manager-applet
+networkmanager-openvpn
+nss-mdns
+nmap
+mtr
+bind
+wireless-regdb
+iptables
 
 # --- Bluetooth ---------------------------------------------------------------
-blueman                         # Bluetooth GUI manager
-bluez-hid2hci                   # Move Bluetooth HID devices to HCI mode
-bluez-utils                     # bluetoothctl and core Bluetooth tools
+blueman
+bluez-hid2hci
+bluez-utils
 
 # --- Hardware & Power (MacBook) ----------------------------------------------
-broadcom-wl-dkms                # Broadcom Wi-Fi driver (MacBook Airport card)
-bolt                            # Thunderbolt device authorisation manager
-brightnessctl                   # Backlight and LED brightness control
-cpupower                        # CPU frequency scaling tool
-dkms                            # Dynamic Kernel Module Support framework
-fwupd                           # Firmware update daemon (LVFS)
-intel-gpu-tools                 # Intel GPU diagnostics and benchmarks
-intel-media-driver              # Intel VA-API media decode/encode driver
-irqbalance                      # Distribute hardware IRQs across CPU cores
-libinput-tools                  # libinput debug and event tools
-libva-intel-driver              # Intel VA-API legacy driver (pre-Broadwell)
-libva-utils                     # VA-API capability info and test utilities
-thermald                        # Intel thermal management daemon
-tlp                             # Advanced laptop power management
-touchegg                        # Multi-touch gesture daemon (trackpad)
-vulkan-intel                    # Intel ANV Vulkan driver
+broadcom-wl-dkms
+bolt
+brightnessctl
+cpupower
+dkms
+fwupd
+intel-gpu-tools
+intel-media-driver
+irqbalance
+libinput-tools
+libva-intel-driver
+libva-utils
+thermald
+tlp
+touchegg
+vulkan-intel
 
 # --- X.org / Display ---------------------------------------------------------
-xorg-server                     # X11 display server
-xorg-xinit                      # startx / .xinitrc session launcher
-xorg-xrandr                     # Display configuration (resolution, layout)
-xorg-xset                       # X server preferences (keyboard, mouse)
-xorg-xsetroot                   # Set root window cursor and background
-xorg-xhost                      # X access control (allow/deny clients)
-xorg-xbacklight                 # Backlight control via X RandR extension
-xorg-xdpyinfo                   # Display info (DPI, dimensions, extensions)
-xorg-xev                        # X event viewer (debug input events)
-xorg-xinput                     # Input device configuration and listing
-xorg-xkill                      # Kill an X window by clicking it
-xorg-xprop                      # Query X window properties
-xf86-input-evdev                # evdev generic input driver
-xf86-input-libinput             # libinput X driver (trackpad, keyboard)
-xf86-input-void                 # Null input driver (disable specific devices)
-xf86-video-intel                # Intel DDX video driver (installed system)
-xf86-video-vesa                 # VESA framebuffer fallback driver
+xorg-server
+xorg-xinit
+xorg-xrandr
+xorg-xset
+xorg-xsetroot
+xorg-xhost
+xorg-xbacklight
+xorg-xdpyinfo
+xorg-xev
+xorg-xinput
+xorg-xkill
+xorg-xprop
+xf86-input-evdev
+xf86-input-libinput
+xf86-input-void
+xf86-video-intel
+xf86-video-vesa
 
 # --- XFCE Desktop ------------------------------------------------------------
-xfce4-session                   # XFCE session manager
-xfce4-settings                  # XFCE settings daemon and manager
-xfconf                          # XFCE configuration storage system
-xfdesktop                       # XFCE desktop manager (wallpaper, icons)
-xfwm4                           # XFCE window manager
-garcon                          # XFCE application menu library
-exo                             # XFCE extensions and utilities library
-xfce4-panel                     # XFCE taskbar/panel
-xfce4-panel-profiles            # Panel layout import/export tool
-xfce4-appfinder                 # Application finder and launcher
-xfce4-terminal                  # XFCE terminal emulator
-xfce4-taskmanager               # Graphical task manager
-xfce4-screenshooter             # Screenshot tool
-xfce4-screensaver               # Screen locker and screensaver
-xfce4-power-manager             # Power management (battery, lid, screen dim)
-xfce4-battery-plugin            # Panel battery indicator
-xfce4-calculator-plugin         # Panel inline calculator
-xfce4-cpufreq-plugin            # Panel CPU frequency display
-xfce4-cpugraph-plugin           # Panel CPU usage graph
-xfce4-diskperf-plugin           # Panel disk I/O performance display
-xfce4-fsguard-plugin            # Panel disk space warning indicator
-xfce4-genmon-plugin             # Panel generic monitor (custom shell scripts)
-xfce4-mount-plugin              # Panel mount/unmount removable drives
-xfce4-netload-plugin            # Panel network load graph
-xfce4-notes-plugin              # Panel sticky notes
-xfce4-places-plugin             # Panel bookmarks and recent files
-xfce4-pulseaudio-plugin         # Panel audio volume control
-xfce4-sensors-plugin            # Panel hardware sensors (temp, fan speed)
-xfce4-systemload-plugin         # Panel CPU/RAM/swap usage display
-xfce4-timer-plugin              # Panel countdown timer and alarm
-xfce4-wavelan-plugin            # Panel Wi-Fi signal strength
-xfce4-weather-plugin            # Panel weather display
-xfce4-whiskermenu-plugin        # Advanced application menu (start menu style)
-xfce4-xkb-plugin                # Panel keyboard layout switcher
+xfce4-session
+xfce4-settings
+xfconf
+xfdesktop
+xfwm4
+garcon
+exo
+xfce4-panel
+xfce4-panel-profiles
+xfce4-appfinder
+xfce4-terminal
+xfce4-taskmanager
+xfce4-screenshooter
+xfce4-screensaver
+xfce4-power-manager
+xfce4-battery-plugin
+xfce4-calculator-plugin
+xfce4-cpufreq-plugin
+xfce4-cpugraph-plugin
+xfce4-diskperf-plugin
+xfce4-fsguard-plugin
+xfce4-genmon-plugin
+xfce4-mount-plugin
+xfce4-netload-plugin
+xfce4-notes-plugin
+xfce4-places-plugin
+xfce4-pulseaudio-plugin
+xfce4-sensors-plugin
+xfce4-systemload-plugin
+xfce4-timer-plugin
+xfce4-wavelan-plugin
+xfce4-weather-plugin
+xfce4-whiskermenu-plugin
+xfce4-xkb-plugin
 
 # --- App Menu (Global Menu) --------------------------------------------------
-appmenu-gtk-module              # GTK module — forwards app menus to XFCE panel
+appmenu-gtk-module
 
 # --- Compositor & Visual -----------------------------------------------------
-picom                           # X compositor (transparency, shadows, blur)
-plank                           # macOS-style application dock
-redshift                        # Blue light filter (adjusts colour temperature)
-rofi                            # App launcher, window switcher, dmenu replacement
-rofi-calc                       # Rofi calculator plugin
-dunst                           # Lightweight notification daemon
-xdg-desktop-portal-xapp        # XDG portals for XFCE (file picker, etc.)
-lxappearance                    # GTK theme and icon theme switcher
-papirus-icon-theme              # Papirus icon theme (flat, material style)
+picom
+plank
+redshift
+rofi
+rofi-calc
+dunst
+xdg-desktop-portal-xapp
+lxappearance
+papirus-icon-theme
 
 # --- Audio -------------------------------------------------------------------
-pipewire                        # Modern audio/video routing server
-pipewire-alsa                   # ALSA compatibility layer for PipeWire
-pipewire-pulse                  # PulseAudio API compatibility for PipeWire
-wireplumber                     # PipeWire session and policy manager
-pamixer                         # CLI audio volume control
-pavucontrol                     # PulseAudio volume control GUI
-alsa-utils                      # ALSA tools: aplay, amixer, alsamixer
-gst-plugins-bad                 # GStreamer extra codecs (H.264, AAC, etc.)
-gst-plugins-ugly                # GStreamer patent-encumbered codecs (MP3, etc.)
-libfdk-aac                      # Fraunhofer AAC audio codec library
+pipewire
+pipewire-alsa
+pipewire-pulse
+wireplumber
+pamixer
+pavucontrol
+alsa-utils
+gst-plugins-bad
+gst-plugins-ugly
+libfdk-aac
 
 # --- Fonts -------------------------------------------------------------------
-terminus-font                   # Bitmap console font (HiDPI: ter-132b)
-ttf-dejavu                      # DejaVu font family (wide Unicode coverage)
-ttf-firacode-nerd               # FiraCode with Nerd Font icons (coding)
-ttf-jetbrains-mono-nerd         # JetBrains Mono with Nerd Font icons
-ttf-ubuntu-font-family          # Ubuntu font family (UI text)
-noto-fonts                      # Google Noto (comprehensive Unicode coverage)
-noto-fonts-emoji                # Noto colour emoji
+terminus-font
+ttf-dejavu
+ttf-firacode-nerd
+ttf-jetbrains-mono-nerd
+ttf-ubuntu-font-family
+noto-fonts
+noto-fonts-emoji
 
 # --- File Manager ------------------------------------------------------------
-thunar                          # XFCE file manager
-thunar-archive-plugin           # Right-click archive creation/extraction
-thunar-media-tags-plugin        # Media file tag display in file manager
-thunar-volman                   # Automatic volume/device mounting
-tumbler                         # D-Bus thumbnail generator service
-gvfs                            # GNOME Virtual File System (base layer)
-gvfs-afc                        # Apple device access (AFC — iPhone/iPad)
-gvfs-gphoto2                    # Digital camera (PTP/MTP) support
-gvfs-mtp                        # Android and MTP device support
-gvfs-smb                        # Windows/Samba network share access
+thunar
+thunar-archive-plugin
+thunar-media-tags-plugin
+thunar-volman
+tumbler
+gvfs
+gvfs-afc
+gvfs-gphoto2
+gvfs-mtp
+gvfs-smb
 
 # --- Apple Device Support ----------------------------------------------------
-ifuse                           # Mount iOS/iPadOS filesystems via AFC
-usbmuxd                         # iOS USB multiplexer daemon
-kpmcore                         # KDE partition manager core (Calamares dep)
-parted                          # CLI partition editor (Calamares dep)
-dosfstools                      # FAT/FAT32 filesystem tools (mkfs.fat)
-arch-install-scripts            # pacstrap, genfstab — used by installers
+ifuse
+usbmuxd
+kpmcore
+parted
+dosfstools
+arch-install-scripts
 
 # --- Media -------------------------------------------------------------------
-mpv                             # Media player (video, audio, streams)
-ristretto                       # Lightweight XFCE image viewer
-gimp                            # GNU Image Manipulation Program
-inkscape                        # Vector graphics editor (SVG)
-feh                             # Lightweight image viewer / wallpaper setter
-yt-dlp                          # Video downloader (YouTube, 1000+ sites)
-liblqr                          # Seam carving library (GIMP liquid rescale)
+mpv
+ristretto
+gimp
+inkscape
+feh
+yt-dlp
+liblqr
 
 # --- Office & Documents ------------------------------------------------------
-libreoffice-still               # Office suite (stable release channel)
-obsidian                        # Markdown knowledge base and note-taking
-evince                          # Document viewer (PDF, DjVu, PostScript)
-tesseract-data-eng              # Tesseract OCR engine language data (English)
-cups                            # Common Unix Printing System
+libreoffice-still
+obsidian
+evince
+tesseract-data-eng
+cups
 
 # --- Browsers ----------------------------------------------------------------
-chromium                        # Chromium browser (sandboxed via firejail — firecfg wires it at first boot)
+chromium
 
 # --- Developer Tools ---------------------------------------------------------
-git                             # Distributed version control system
-github-cli                      # GitHub CLI (gh) — PRs, issues, releases
-gdb                             # GNU debugger
-cmake                           # Cross-platform build system generator
-meson                           # Fast build system (used by GTK/GNOME projects)
-go                              # Go programming language toolchain
-npm                             # Node.js package manager
-uv                              # Fast Python package and project manager
-arduino-cli                     # Arduino CLI toolchain and board manager
+git
+github-cli
+gdb
+cmake
+meson
+go
+npm
+uv
+arduino-cli
 
 # --- Security & Privacy ------------------------------------------------------
-fail2ban                        # Ban IPs after repeated failed login attempts
-ufw                             # Uncomplicated Firewall (iptables frontend)
-firejail                        # Sandbox for untrusted applications
-gnome-keyring                   # Credential and secret storage daemon
-macchanger                      # Randomise or set a custom MAC address
-mokutil                         # Secure Boot MOK key management
+fail2ban
+ufw
+firejail
+gnome-keyring
+macchanger
+mokutil
 
 # --- Backup & Sync -----------------------------------------------------------
-rclone                          # Cloud storage sync (S3, GDrive, Dropbox, etc.)
-timeshift                       # System snapshot and restore (rsync/btrfs)
-sshfs                           # Mount remote filesystems over SSH
+rclone
+timeshift
+sshfs
 
 # --- Package Management ------------------------------------------------------
-pacman-contrib                  # pacman helper scripts (paccache, checkupdates)
-pkgfile                         # File-to-package lookup database
-reflector                       # Automatically update and rank mirror list
+pacman-contrib
+pkgfile
+reflector
 
 # --- Input & Window Control --------------------------------------------------
-xbindkeys                       # Bind keyboard/mouse buttons to commands
-xcape                           # Remap modifier keys to actions on tap
-xdotool                         # X11 keyboard and mouse input simulation
-playerctl                       # MPRIS media player CLI controller
-wmctrl                          # CLI window manager control
+xbindkeys
+xcape
+xdotool
+playerctl
+wmctrl
 
 # --- Libraries (runtime deps) ------------------------------------------------
-lib32-libdbusmenu-glib          # 32-bit DBusMenu glib (Steam / 32-bit apps)
-lib32-libdbusmenu-gtk3          # 32-bit DBusMenu GTK3
-lib32-mesa                      # 32-bit Mesa OpenGL/Vulkan (32-bit app support)
-libxcrypt-compat                # Legacy libcrypt.so.1 (older binary compat)
+lib32-libdbusmenu-glib
+lib32-libdbusmenu-gtk3
+lib32-mesa
+libxcrypt-compat
