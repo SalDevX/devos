@@ -118,6 +118,7 @@ pipewire-alsa
 pipewire-pulse
 pkgfile
 plank
+pv
 playerctl
 plocate
 powertop
