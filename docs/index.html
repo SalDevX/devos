@@ -578,6 +578,179 @@ footer {
   opacity: 1;
   transform: none;
 }
+
+/* ── HERO HEADLINE (sentence form) ── */
+.hero-headline {
+  font-size: clamp(28px, 5vw, 62px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.08;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+.hero-headline .hl-accent {
+  color: var(--blue);
+  filter: drop-shadow(0 0 32px rgba(23,147,209,0.5));
+}
+
+/* ── PROSE SECTION (Is DevOS for you?) ── */
+.prose-section {
+  padding: 0 24px 96px;
+}
+.prose-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.prose-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 56px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+@media (max-width: 640px) {
+  .prose-block { padding: 32px 24px }
+}
+.prose-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 24px;
+}
+.prose-block p {
+  font-size: 17px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.prose-block p:last-child { margin-bottom: 0 }
+.prose-welcome {
+  font-size: 20px !important;
+  font-weight: 700;
+  color: var(--blue) !important;
+}
+
+/* ── COMPARE SECTION (3GB vs 15.5GB) ── */
+.compare-section {
+  padding: 0 24px 96px;
+}
+.compare-grid {
+  max-width: 960px;
+  margin: 0 auto 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .compare-grid { grid-template-columns: 1fr }
+}
+.compare-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.compare-card.compare-devos {
+  border-color: var(--blue-border);
+  box-shadow: 0 0 48px rgba(23,147,209,0.1);
+}
+.compare-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+.compare-tag.tag-macos {
+  color: var(--muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+}
+.compare-tag.tag-devos {
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+}
+.compare-size-num {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -3px;
+  margin-bottom: 20px;
+}
+.compare-size-num.n-macos { color: rgba(136,136,136,0.45) }
+.compare-size-num.n-devos {
+  color: var(--blue);
+  text-shadow: 0 0 40px rgba(23,147,209,0.6);
+}
+.compare-size-unit {
+  font-size: 0.42em;
+  letter-spacing: 0;
+  font-weight: 700;
+  vertical-align: baseline;
+}
+.compare-card p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.compare-conclusion {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.compare-conclusion p {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+.compare-conclusion p:last-child {
+  margin-bottom: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.5px;
+}
+
+/* ── INSTALL CONFIDENCE SECTION ── */
+.install-section {
+  padding: 0 24px 96px;
+}
+.install-intro {
+  max-width: 660px;
+  margin: 0 auto 48px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.install-grid {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .install-grid { grid-template-columns: 1fr }
+}
+.install-closing {
+  max-width: 560px;
+  margin: 40px auto 0;
+  text-align: center;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+}
 </style>
 </head>
 <body>
@@ -610,21 +783,21 @@ footer {
       Arch Linux · Rolling Release
     </div>
 
-    <h1 class="hero-title">
-      <span class="dev">Dev</span><span class="os">OS</span>
+    <h1 class="hero-headline">
+      Apple abandoned your Intel MacBook.<br/>
+      <span class="hl-accent">DevOS</span> didn't.
     </h1>
 
     <p class="hero-sub">
-      <strong>Arch Linux for developers</strong> who want everything working on day one.
-      XFCE desktop, LTS kernel, GUI installer, and full Apple MacBook support — out of the box.
+      Arch Linux, fully configured for Intel MacBooks. Boot from USB and try everything before you install — LibreOffice, GIMP, Brave, the full terminal stack. No commitment, no cables, no terminal required.
     </p>
 
     <div class="hero-ctas">
-      <a class="btn-glow" href="#preview">
-        ▶  Live Installer Preview
+      <a class="btn-glow" href="#">
+        ⬇&ensp;Download ISO
       </a>
-      <a class="btn-glass" href="https://github.com/SalDevX/devos#build-the-iso" target="_blank">
-        Build the ISO  →
+      <a class="btn-glass" href="#preview">
+        Try the installer preview →
       </a>
     </div>
 
@@ -638,6 +811,109 @@ footer {
       </div>
     </div>
   </section>
+
+  <!-- ── IS DEVOS FOR YOU? ── -->
+  <section class="prose-section">
+    <div class="prose-inner reveal">
+      <div class="prose-block">
+        <p class="prose-eyebrow">Is DevOS for you?</p>
+        <p>If you've never used Linux before — don't start here. Go install Manjaro or Linux Mint first. Break things. Fix things. Learn why things work the way they do. That pain is not wasted — it's the foundation.</p>
+        <p>DevOS is for when you're past that. When you need a machine running on the absolute fly — no configuration marathon, no driver hunting, no half-working trackpad. Boot, install, work.</p>
+        <p class="prose-welcome">If that's you — welcome.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3GB VS 15.5GB ── -->
+  <section class="compare-section">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">The numbers</p>
+      <h2 class="section-title">3 GB vs 15.5 GB</h2>
+      <p class="section-sub">Your MacBook deserves better than being put out to pasture.</p>
+    </div>
+
+    <div class="compare-grid reveal">
+      <div class="compare-card compare-macos">
+        <div class="compare-tag tag-macos">macOS Sequoia</div>
+        <div class="compare-size-num n-macos">15.5<span class="compare-size-unit">GB</span></div>
+        <p>The macOS Sequoia installer is 15.5 GB. It requires 25 GB of free space to install. And it won't even run on your MacBook.</p>
+      </div>
+      <div class="compare-card compare-devos">
+        <div class="compare-tag tag-devos">DevOS</div>
+        <div class="compare-size-num n-devos">3<span class="compare-size-unit">GB</span></div>
+        <p>Boot it from a USB stick in under a minute. Try everything — LibreOffice, GIMP, Brave, the full terminal stack. If you like it, install it. If you don't, pull the stick out and walk away. Nothing touched, nothing lost.</p>
+      </div>
+    </div>
+
+    <div class="compare-conclusion reveal">
+      <p>macOS Tahoe is the last version Apple will ever ship for Intel Macs. After that, your hardware is officially dead to them.</p>
+      <p>To us it's very much alive.</p>
+    </div>
+  </section>
+
+  <!-- ── INSTALL WITH CONFIDENCE ── -->
+  <section class="install-section" id="install">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">Install with confidence</p>
+      <h2 class="section-title">No terminal.<br/>No commands. No guesswork.</h2>
+    </div>
+
+    <div class="install-intro reveal">
+      DevOS uses Calamares — the same battle-tested graphical installer used by Manjaro, KDE Neon, and dozens of other major distributions. Click through location, keyboard, partitioning, and user setup.
+    </div>
+
+    <div class="install-grid">
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🔐</div>
+        <h3 class="feat-title">Encryption</h3>
+        <p class="feat-desc">Full disk encryption supported out of the box. Enable LUKS encryption with a single checkbox during install. Your data is yours.</p>
+        <div class="feat-chips">
+          <span class="chip">LUKS</span>
+          <span class="chip">single checkbox</span>
+          <span class="chip">full disk</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">💾</div>
+        <h3 class="feat-title">Partitioning</h3>
+        <p class="feat-desc">Manual, automatic, or alongside an existing OS. Supports GPT and MBR, ext4, btrfs, xfs, and swap. The installer detects your existing partitions and won't touch anything you don't tell it to.</p>
+        <div class="feat-chips">
+          <span class="chip">GPT · MBR</span>
+          <span class="chip">ext4 · btrfs · xfs</span>
+          <span class="chip">dual-boot</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🚀</div>
+        <h3 class="feat-title">Bootloader</h3>
+        <p class="feat-desc">systemd-boot configured automatically on UEFI systems. Clean, fast, no grub bloat.</p>
+        <div class="feat-chips">
+          <span class="chip">systemd-boot</span>
+          <span class="chip">UEFI auto</span>
+        </div>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">🛡</div>
+        <h3 class="feat-title">After Install</h3>
+        <p class="feat-desc">Root account locked by default. sudo via wheel group only. UFW firewall active. fail2ban running. sshd off. You're protected from minute one — not after a hardening checklist.</p>
+        <div class="feat-chips">
+          <span class="chip">ufw</span>
+          <span class="chip">fail2ban</span>
+          <span class="chip">sshd off</span>
+          <span class="chip">wheel-only sudo</span>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="install-closing reveal">Installing an OS should feel safe. DevOS makes it feel safe.</p>
+  </section>
+
+  <div class="divider"></div>
 
   <!-- ── STATS ── -->
   <section class="stats reveal">
