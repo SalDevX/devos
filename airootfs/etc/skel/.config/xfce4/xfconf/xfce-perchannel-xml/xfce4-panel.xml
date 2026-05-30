@@ -8,7 +8,7 @@
     <property name="panel-1" type="empty">
       <property name="autohide-behavior" type="uint" value="0"/>
       <property name="background-image" type="string" value=""/>
-      <property name="background-style" type="uint" value="1"/>
+      <property name="background-style" type="uint" value="0"/>
       <property name="border-width" type="uint" value="0"/>
       <property name="enable-struts" type="bool" value="true"/>
       <property name="icon-size" type="uint" value="0"/>
@@ -18,7 +18,7 @@
       <property name="plugin-ids" type="array">
         <value type="int" value="21"/>
         <value type="int" value="25"/>
-        <value type="int" value="14"/>
+
         <value type="int" value="3"/>
         <value type="int" value="16"/>
         <value type="int" value="22"/>
@@ -26,15 +26,12 @@
         <value type="int" value="27"/>
         <value type="int" value="4"/>
         <value type="int" value="11"/>
-        <value type="int" value="33"/>
         <value type="int" value="23"/>
         <value type="int" value="5"/>
         <value type="int" value="20"/>
-        <value type="int" value="18"/>
         <value type="int" value="35"/>
         <value type="int" value="15"/>
         <value type="int" value="9"/>
-        <value type="int" value="37"/>
         <value type="int" value="57"/>
         <value type="int" value="2"/>
         <value type="int" value="29"/>
@@ -55,7 +52,7 @@
         <value type="int" value="32"/>
         <value type="int" value="36"/>
       </property>
-      <property name="position" type="string" value="p=6;x=2960;y=11"/>
+      <property name="position" type="string" value="p=6;x=0;y=11"/>
       <property name="position-locked" type="bool" value="true"/>
       <property name="size" type="uint" value="20"/>
       <property name="background-rgba" type="array">
@@ -159,13 +156,7 @@
         <property name="temperature" type="int" value="0"/>
         <property name="windspeed" type="int" value="0"/>
       </property>
-    </property>
-    <property name="plugin-18" type="string" value="launcher">
-      <property name="items" type="array">
-        <value type="string" value="17381740301.desktop"/>
-      </property>
-    </property>
-    <property name="plugin-19" type="string" value="separator">
+    </property>    <property name="plugin-19" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
     <property name="plugin-2" type="string" value="separator">
@@ -219,15 +210,7 @@
       <property name="tooltip-format" type="string" value="%A %d %B %Y"/>
     </property>
     <property name="plugin-7" type="string" value="power-manager-plugin"/>
-    <property name="plugin-14" type="string" value="appmenu">
-      <property name="plugins" type="empty">
-        <property name="plugin-14" type="empty">
-          <property name="expand" type="bool" value="true"/>
-          <property name="bold-application-name" type="bool" value="false"/>
-          <property name="compact-mode" type="bool" value="false"/>
-        </property>
-      </property>
-    </property>
+
     <property name="plugin-21" type="string" value="separator">
       <property name="expand" type="bool" value="false"/>
       <property name="style" type="uint" value="0"/>
@@ -290,24 +273,12 @@
     </property>
     <property name="plugin-30" type="string" value="fsguard"/>
     <property name="plugin-31" type="string" value="fsguard"/>
-    <property name="plugin-32" type="string" value="separator"/>
-    <property name="plugin-33" type="string" value="launcher">
-      <property name="items" type="array">
-        <value type="string" value="17602771551.desktop"/>
-      </property>
-    </property>
-    <property name="plugin-35" type="string" value="launcher">
+    <property name="plugin-32" type="string" value="separator"/>    <property name="plugin-35" type="string" value="launcher">
       <property name="items" type="array">
         <value type="string" value="17633838051.desktop"/>
       </property>
     </property>
-    <property name="plugin-36" type="string" value="xfce4-timer-plugin"/>
-    <property name="plugin-37" type="string" value="launcher">
-      <property name="items" type="array">
-        <value type="string" value="17668853671.desktop"/>
-      </property>
-    </property>
-    <property name="plugin-29" type="string" value="pulseaudio">
+    <property name="plugin-36" type="string" value="xfce4-timer-plugin"/>    <property name="plugin-29" type="string" value="pulseaudio">
       <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
       <property name="known-players" type="string" value="Brave;Chromium;Code;firefox;firefox-esr;vlc"/>
       <property name="play-sound" type="bool" value="false"/>

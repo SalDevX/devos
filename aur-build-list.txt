@@ -2,11 +2,23 @@
 # DevOS AUR build list — built by devos/tools/build-aur-repo.sh
 # All packages here are AUR-only (not in official repos).
 # Build order matters: deps must appear before dependents.
+#
+# A line of the form 'local:<path>' builds a PKGBUILD shipped in this repo
+# (path relative to the repo root) instead of cloning from the AUR. Used for the
+# forked Calamares package that compiles DevOS's in-tree devosnetwork module.
 # =============================================================================
+
+# --- Dropped from official repos (libs needed by xfdashboard + libchamplain) -
+# Build in order: cogl → clutter → clutter-gtk. Arch removed all three in 2024
+# so xfdashboard + libchamplain can no longer resolve them at install time
+# without devos-local. cogl provides libcogl.so=20-64 which clutter links against.
+cogl                            # GPU acceleration lib — clutter runtime dep
+clutter                         # 1.x toolkit for OpenGL UI (xfdashboard runtime dep)
+clutter-gtk                     # GTK embedding for clutter (libchamplain runtime dep)
 
 # --- Installer deps (build first — calamares depends on webkit2gtk) ----------
 webkit2gtk                      # WebKit2 GTK 4.0 API — older version; calamares dep
-calamares                       # GUI graphical installer
+local:pkgbuilds/calamares       # GUI installer — DevOS fork of AUR calamares; adds the in-tree devosnetwork view module (see devos/pkgbuilds/calamares/PKGBUILD)
 
 # --- Browser -----------------------------------------------------------------
 brave-bin                       # Brave browser — prebuilt binary release

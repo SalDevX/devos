@@ -1,0 +1,4 @@
+#!/bin/bash
+# Launches Calamares with root privileges, preserving X display environment.
+# Used by both the autostart entry and the desktop shortcut on the live ISO.
+exec sudo -nE /usr/bin/calamares "$@"

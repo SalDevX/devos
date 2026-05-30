@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=AppMenu Registrar
-Comment=Global menu D-Bus registrar for xfce4-panel appmenu plugin
-Exec=/usr/lib/vala-panel/appmenu-registrar --gapplication-service
-OnlyShowIn=XFCE;
-StartupNotify=false
-Terminal=false
-Hidden=false

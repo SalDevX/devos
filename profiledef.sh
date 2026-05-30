@@ -11,7 +11,7 @@ iso_version="$(date +%Y.%m.%d)"
 install_dir="arch"
 buildmodes=('iso')
 bootmodes=('bios.syslinux'
-           'uefi.systemd-boot')
+           'uefi.grub')
 arch="x86_64"
 pacman_conf="pacman.conf"
 airootfs_image_type="squashfs"
@@ -23,5 +23,10 @@ file_permissions=(
   ["/root"]="0:0:750"
   ["/root/customize_airootfs.sh"]="0:0:755"
   ["/usr/local/bin"]="0:0:755"
+  ["/usr/local/bin/devos-calamares"]="0:0:755"
   ["/etc/skel"]="0:0:755"
+  ["/etc/sudoers.d/zz-live-user"]="0:0:440"
+  # Calamares post-install logic is now native Python job modules under
+  # /etc/calamares/modules/{copyairootfs,devossetup,devoscleanup}/main.py —
+  # imported by Calamares, not exec'd, so they need no execute bit.
 )

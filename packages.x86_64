@@ -15,6 +15,7 @@ gcc-libs
 grub
 efibootmgr
 syslinux
+mkinitcpio
 mkinitcpio-archiso
 archiso
 plymouth
@@ -24,6 +25,7 @@ mokutil
 zsh
 zsh-autosuggestions
 zsh-syntax-highlighting
+zsh-theme-powerlevel10k
 bash-completion
 alacritty
 tmux
@@ -109,6 +111,7 @@ libva-utils
 thermald
 tlp
 touchegg
+libinput-gestures
 vulkan-intel
 
 # --- X.org / Display ---------------------------------------------------------
@@ -148,6 +151,7 @@ xfce4-screensaver
 xfce4-power-manager
 xfce4-battery-plugin
 xfce4-calculator-plugin
+xfce4-dict
 xfce4-cpufreq-plugin
 xfce4-cpugraph-plugin
 xfce4-diskperf-plugin
@@ -165,6 +169,7 @@ xfce4-wavelan-plugin
 xfce4-weather-plugin
 xfce4-whiskermenu-plugin
 xfce4-xkb-plugin
+xfce4-clipman-plugin
 
 # --- App Menu (Global Menu) --------------------------------------------------
 appmenu-gtk-module
@@ -179,11 +184,13 @@ dunst
 xdg-desktop-portal-xapp
 lxappearance
 papirus-icon-theme
+adwaita-icon-theme
 
 # --- Audio -------------------------------------------------------------------
 pipewire
 pipewire-alsa
 pipewire-pulse
+pipewire-jack
 wireplumber
 pamixer
 pavucontrol
@@ -220,6 +227,15 @@ kpmcore
 parted
 dosfstools
 arch-install-scripts
+
+# --- Calamares runtime deps (KF6 — omitted from AUR PKGBUILD) ----------------
+# calamares binary + modules link against these sonames but the PKGBUILD does
+# not declare them; pacman will not pull them in automatically without this list.
+# Verified via ldd on calamares-3.4.2-2-x86_64.pkg.tar.zst.
+karchive
+kconfig
+kcrash
+kpackage
 
 # --- Media -------------------------------------------------------------------
 mpv

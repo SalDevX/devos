@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <!-- prefix "/" + file "devosnetwork.qml" => resource ":/devosnetwork.qml".
+         With qmlSearch:qrc + qmlFilename:devosnetwork (devosnetwork.conf),
+         Calamares' searchQmlFile() resolves "qrc:/devosnetwork.qml". -->
+    <qresource prefix="/">
+        <file>devosnetwork.qml</file>
+    </qresource>
+</RCC>

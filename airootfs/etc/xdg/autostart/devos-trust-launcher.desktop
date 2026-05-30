@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Trust DevOS Installer Launcher
+Exec=sh -c 'test -f /home/user/Desktop/install-devos.desktop && gio set /home/user/Desktop/install-devos.desktop metadata::trusted true'
+NoDisplay=true
+Terminal=false
+X-XFCE-Autostart-Override=true

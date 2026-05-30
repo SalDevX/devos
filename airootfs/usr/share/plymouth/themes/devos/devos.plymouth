@@ -6,3 +6,6 @@ ModuleName=script
 [script]
 ImageDir=/usr/share/plymouth/themes/devos
 ScriptFile=/usr/share/plymouth/themes/devos/devos.script
+# No Font= key: the title is a pre-rendered PNG (devos-logo.png), so the splash
+# needs no font embedded in the initramfs. This was the recurring black-screen
+# cause — fc-match found no font in early boot and Image.Text rendered nothing.

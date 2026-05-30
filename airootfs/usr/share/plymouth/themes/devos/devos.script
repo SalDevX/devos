@@ -1,56 +1,63 @@
-// DevOS Plymouth Theme — macOS style
-// Black background · centered logo · thin white progress bar
+// DevOS Plymouth Theme v2
+// Dark background · "DevOS" text · macOS-style pill progress bar
+// Title: devos-logo.png — pre-rendered "DevOS" in Geist Light, so the splash has
+//        NO early-boot font dependency (Image.Text + fc-match repeatedly rendered
+//        nothing in the initramfs → black screen). Regenerate from Geist-Light.ttf.
+// Bar:  4-piece pill (cap + stretch + cap) — bar_track_cap/mid + bar_fill_cap/mid PNGs
 
-screen_width  = Window.GetWidth();
-screen_height = Window.GetHeight();
+Window.SetBackgroundTopColor(0.067, 0.067, 0.067);
+Window.SetBackgroundBottomColor(0.067, 0.067, 0.067);
 
-// --- Background ---
-Window.SetBackgroundTopColor(0.051, 0.051, 0.051);     // #0d0d0d
-Window.SetBackgroundBottomColor(0, 0, 0);
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
 
-// --- Logo ---
-logo_image = Image("logo.png");
-logo_natural_w = logo_image.GetWidth();
-logo_natural_h = logo_image.GetHeight();
-
-// Scale to ~15% of screen height, keep aspect ratio
-logo_scale = screen_height * 0.15 / logo_natural_h;
-logo_w = Math.Round(logo_natural_w * logo_scale);
-logo_h = Math.Round(logo_natural_h * logo_scale);
-
-logo_scaled = logo_image.Scale(logo_w, logo_h);
-logo_sprite = Sprite(logo_scaled);
-logo_sprite.SetPosition(
-    Math.Round((screen_width  - logo_w) / 2),
-    Math.Round(screen_height  * 0.42 - logo_h / 2),
-    1
+// --- Title ---
+title_img    = Image("devos-logo.png");
+title_sprite = Sprite(title_img);
+title_sprite.SetPosition(
+    Math.Round(screen_w / 2 - title_img.GetWidth()  / 2),
+    Math.Round(screen_h * 0.44 - title_img.GetHeight() / 2),
+    10
 );
 
-// --- Progress bar geometry (macOS: centered, 40% wide, 4px tall, ~72% down) ---
-bar_width  = Math.Round(screen_width * 0.40);
-bar_height = 4;
-bar_x      = Math.Round((screen_width - bar_width) / 2);
-bar_y      = Math.Round(screen_height * 0.72);
+// --- Progress bar: 30% screen width, 6 px tall, pill-shaped ends ---
+bar_w = Math.Round(screen_w * 0.30);
+bar_h = 6;
+cap_w = bar_h;    // end-cap image is bar_h × bar_h (circle)
+bar_x = Math.Round((screen_w - bar_w) / 2);
+bar_y = Math.Round(screen_h * 0.62 - bar_h / 2);
 
-// Track
-track_img    = Image("progress_bar_bg.png");
-track_sprite = Sprite(track_img.Scale(bar_width, bar_height));
-track_sprite.SetPosition(bar_x, bar_y, 2);
+// Track (rgba 255,255,255,0.18)
+trk_cap = Image("bar_track_cap.png");
+trk_mid = Image("bar_track_mid.png");
+trk_l = Sprite(trk_cap);                              trk_l.SetPosition(bar_x,                bar_y, 2);
+trk_c = Sprite(trk_mid.Scale(bar_w - cap_w * 2, bar_h)); trk_c.SetPosition(bar_x + cap_w,    bar_y, 2);
+trk_r = Sprite(trk_cap);                              trk_r.SetPosition(bar_x + bar_w - cap_w, bar_y, 2);
 
-// Fill — starts at 1px wide, grows with progress
-fill_img    = Image("progress_bar_fg.png");
-fill_sprite = Sprite(fill_img.Scale(1, bar_height));
-fill_sprite.SetPosition(bar_x, bar_y, 3);
+// Fill (rgba 255,255,255,0.85) — hidden until enough progress to show the pill
+fill_cap = Image("bar_fill_cap.png");
+fill_mid = Image("bar_fill_mid.png");
+fill_l = Sprite(fill_cap); fill_l.SetOpacity(0); fill_l.SetPosition(bar_x, bar_y, 3);
+fill_c = Sprite(fill_mid.Scale(1, bar_h));        fill_c.SetPosition(bar_x + cap_w, bar_y, 3);
+fill_r = Sprite(fill_cap); fill_r.SetOpacity(0);
 
-// --- Callbacks ---
 fun ProgressCallback(duration, progress) {
-    new_w = Math.Max(1, Math.Round(bar_width * progress));
-    fill_sprite.SetImage(fill_img.Scale(new_w, bar_height));
+    fill_w = Math.Round(bar_w * progress);
+    if (fill_w < cap_w * 2) {
+        fill_l.SetOpacity(0);
+        fill_c.SetImage(fill_mid.Scale(1, bar_h));
+        fill_r.SetOpacity(0);
+    } else {
+        fill_l.SetOpacity(1.0);
+        fill_c.SetImage(fill_mid.Scale(fill_w - cap_w * 2, bar_h));
+        fill_r.SetOpacity(1.0);
+        fill_r.SetX(bar_x + fill_w - cap_w);
+        fill_r.SetY(bar_y);
+        fill_r.SetZ(3);
+    }
 }
 
-fun RefreshCallback() {
-    // no animation needed — static logo, deterministic bar
-}
+fun RefreshCallback() {}
 
 Plymouth.SetBootProgressFunction(ProgressCallback);
 Plymouth.SetRefreshFunction(RefreshCallback);

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DevOS Installer
+Comment=Install DevOS to your hard drive
+Exec=devos-calamares
+Icon=calamares
+NoDisplay=true
+Categories=System;

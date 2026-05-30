@@ -38,8 +38,7 @@
     <property name="ToolbarStyle" type="empty"/>
     <property name="ToolbarIconSize" type="empty"/>
     <property name="ShellShowsMenubar" type="bool" value="true"/>
-    <property name="ShellShowsAppmenu" type="bool" value="true"/>
-    <property name="Modules" type="string" value="appmenu-gtk-module"/>
+    <property name="ShellShowsAppmenu" type="bool" value="false"/>
   </property>
   <property name="Gdk" type="empty">
     <property name="WindowScalingFactor" type="int" value="1"/>

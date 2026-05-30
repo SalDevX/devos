@@ -1,0 +1,6 @@
+# Only the PKGBUILD is tracked. build-aur-repo.sh redirects makepkg's build,
+# package and source output to /var/tmp, but ignore the usual artifacts in case
+# makepkg is ever run directly in this directory.
+*
+!.gitignore
+!PKGBUILD

@@ -13,31 +13,60 @@
             <value type="double" value="0.7803921568627451"/>
             <value type="double" value="1"/>
           </property>
-          <property name="color-style" type="int" value="3"/>
-          <property name="image-style" type="int" value="4"/>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
         </property>
       </property>
       <property name="monitorDP-2" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/Seed of Life 2.jpg"/>
+          <property name="last-image" type="string" value=""/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
         </property>
       </property>
       <property name="monitoreDP1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/Seed of Life 2.jpg"/>
-          <property name="image-style" type="int" value="4"/>
+          <property name="last-image" type="string" value=""/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
         </property>
       </property>
       <property name="monitorDP2" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
-          <property name="image-style" type="int" value="1"/>
+          <property name="last-image" type="string" value=""/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
         </property>
       </property>
       <property name="monitorDP1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
-          <property name="image-style" type="int" value="1"/>
+          <property name="last-image" type="string" value=""/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="0"/>
         </property>
       </property>
     </property>

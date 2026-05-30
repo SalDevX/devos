@@ -40,7 +40,7 @@
   <property name="do-fadeout" type="bool" value="true"/>
   <property name="initial-opacity" type="double" value="0.90000000000000002"/>
   <property name="min-width-enabled" type="bool" value="true"/>
-  <property name="theme" type="string" value="McOS-MJV-Dark-Xfce"/>
+  <property name="theme" type="string" value="Default"/>
   <property name="expire-timeout" type="int" value="2"/>
   <property name="do-slideout" type="bool" value="true"/>
   <property name="notification-display-fields" type="string" value="icon-summary"/>

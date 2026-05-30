@@ -16,3 +16,6 @@ devos-local/
 build-success.log
 build-failed.log
 devos-aur-built.txt
+
+# graphify output belongs only at repo root — never run graphify from here
+graphify-out/

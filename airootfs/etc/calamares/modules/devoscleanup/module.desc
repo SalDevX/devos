@@ -1,0 +1,5 @@
+---
+type:       "job"
+name:       "devoscleanup"
+interface:  "python"
+script:     "main.py"
