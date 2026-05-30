@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="color-scheme" content="dark light"/>
 <meta name="description" content="DevOS — Arch Linux for developers. XFCE desktop, LTS kernel, Calamares GUI installer, Apple MacBook ready."/>
 <title>DevOS — Arch Linux for Developers</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml"/>
@@ -10,19 +11,45 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
 
+/* ── THEME TOKENS ──────────────────────────────────────────────────────────
+   Dark is the default. Every value that differs between themes lives here.
+   The light override at the bottom of this file re-declares only these keys.
+   ─────────────────────────────────────────────────────────────────────── */
 :root {
+  color-scheme: dark;
+
+  /* Brand accent — unchanged in both themes */
   --blue:        #1793d1;
   --blue-glow:   rgba(23,147,209,0.35);
   --blue-dim:    rgba(23,147,209,0.12);
   --blue-border: rgba(23,147,209,0.25);
+
+  /* Page canvas */
   --bg:          #08080f;
   --surface:     rgba(255,255,255,0.04);
   --border:      rgba(255,255,255,0.07);
   --border-h:    rgba(255,255,255,0.14);
+
+  /* Typography */
   --text:        #e8e8e8;
   --muted:       #888;
   --dim:         #3a3a3a;
-  --radius:      16px;
+  --text-inverse: #ffffff;       /* "OS" in DevOS logo; on coloured/dark bg */
+
+  /* Structural composites — converted from former hardcoded values */
+  --nav-bg:              rgba(8,8,15,0.65);
+  --anim-bar-bg:         rgba(14,14,22,0.9);
+  --browser-chrome-bg:   #111119;
+  --url-bar-bg:          rgba(255,255,255,0.05);
+  --table-th-bg:         rgba(255,255,255,0.03);
+  --table-td-border:     rgba(255,255,255,0.04);
+  --tag-neutral-bg:      rgba(255,255,255,0.05);
+  --macos-num-color:     rgba(136,136,136,0.45);
+  --glass-hover-bg:      rgba(255,255,255,0.08);
+  --glass-hover-border:  rgba(255,255,255,0.20);
+
+  /* Shared */
+  --radius: 16px;
 }
 
 html { scroll-behavior: smooth }
@@ -51,7 +78,7 @@ body {
 .blob-2 {
   width: 55vw; height: 55vw;
   bottom: -20%; left: -15%;
-  background: radial-gradient(circle, rgba(80,40,180,0.1) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(80,40,180,0.10) 0%, transparent 65%);
 }
 .blob-3 {
   width: 40vw; height: 40vw;
@@ -83,7 +110,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  background: rgba(8,8,15,0.65);
+  background: var(--nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border);
@@ -96,7 +123,7 @@ nav {
   text-decoration: none;
 }
 .nav-logo span:first-child { color: var(--blue) }
-.nav-logo span:last-child  { color: #fff }
+.nav-logo span:last-child  { color: var(--text-inverse) }
 
 .nav-links {
   display: flex;
@@ -176,7 +203,7 @@ nav {
   color: var(--blue);
   filter: drop-shadow(0 0 40px rgba(23,147,209,0.55));
 }
-.hero-title .os { color: #fff }
+.hero-title .os { color: var(--text-inverse) }
 
 .hero-sub {
   font-size: clamp(16px, 2.5vw, 20px);
@@ -230,8 +257,8 @@ nav {
   transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 .btn-glass:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.2);
+  background: var(--glass-hover-bg);
+  border-color: var(--glass-hover-border);
   transform: translateY(-2px);
 }
 
@@ -251,7 +278,7 @@ nav {
 }
 .anim-frame img { display: block; width: 100%; height: auto }
 .anim-bar {
-  background: rgba(14,14,22,0.9);
+  background: var(--anim-bar-bg);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
   padding: 10px 20px;
@@ -445,7 +472,7 @@ nav {
     0 0 80px rgba(23,147,209,0.07);
 }
 .browser-chrome {
-  background: #111119;
+  background: var(--browser-chrome-bg);
   border-bottom: 1px solid var(--border);
   padding: 12px 16px;
   display: flex;
@@ -459,7 +486,7 @@ nav {
 .b-dot.g { background: #28ca41 }
 .b-url {
   flex: 1;
-  background: rgba(255,255,255,0.05);
+  background: var(--url-bar-bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 5px 14px;
@@ -506,7 +533,7 @@ nav {
   backdrop-filter: blur(20px);
 }
 .compat-table th {
-  background: rgba(255,255,255,0.03);
+  background: var(--table-th-bg);
   padding: 14px 20px;
   font-size: 11px;
   font-weight: 600;
@@ -520,7 +547,7 @@ nav {
   padding: 14px 20px;
   font-size: 13px;
   color: var(--muted);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--table-td-border);
 }
 .compat-table tr:last-child td { border-bottom: none }
 .compat-table tr:hover td { background: rgba(23,147,209,0.04) }
@@ -540,7 +567,7 @@ footer {
   margin-bottom: 16px;
 }
 .footer-logo span:first-child { color: var(--blue) }
-.footer-logo span:last-child  { color: #fff }
+.footer-logo span:last-child  { color: var(--text-inverse) }
 .footer-links {
   display: flex;
   justify-content: center;
@@ -670,7 +697,7 @@ footer {
 }
 .compare-tag.tag-macos {
   color: var(--muted);
-  background: rgba(255,255,255,0.05);
+  background: var(--tag-neutral-bg);
   border: 1px solid var(--border);
 }
 .compare-tag.tag-devos {
@@ -685,7 +712,7 @@ footer {
   letter-spacing: -3px;
   margin-bottom: 20px;
 }
-.compare-size-num.n-macos { color: rgba(136,136,136,0.45) }
+.compare-size-num.n-macos { color: var(--macos-num-color) }
 .compare-size-num.n-devos {
   color: var(--blue);
   text-shadow: 0 0 40px rgba(23,147,209,0.6);
@@ -751,6 +778,88 @@ footer {
   color: var(--text);
   line-height: 1.6;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LIGHT THEME
+   Inverted luminance — same typographic rhythm, same layout, same accent.
+   Only token values change; no selector structure is duplicated.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    /* Brand accent stays identical; dim/border adjusted for light canvas */
+    --blue-dim:    rgba(23,147,209,0.09);
+    --blue-border: rgba(23,147,209,0.22);
+
+    /* Page canvas */
+    --bg:          #f2f3f8;
+    --surface:     rgba(255,255,255,0.72);
+    --border:      rgba(0,0,0,0.08);
+    --border-h:    rgba(0,0,0,0.13);
+
+    /* Typography */
+    --text:        #0e0e18;
+    --muted:       #52526a;
+    --dim:         #9898ae;
+    --text-inverse: #0e0e18;
+
+    /* Structural composites */
+    --nav-bg:              rgba(242,243,248,0.78);
+    --anim-bar-bg:         rgba(235,237,248,0.96);
+    --browser-chrome-bg:   #e2e4f0;
+    --url-bar-bg:          rgba(0,0,0,0.05);
+    --table-th-bg:         rgba(0,0,0,0.025);
+    --table-td-border:     rgba(0,0,0,0.05);
+    --tag-neutral-bg:      rgba(0,0,0,0.04);
+    --macos-num-color:     rgba(60,60,90,0.28);
+    --glass-hover-bg:      rgba(0,0,0,0.04);
+    --glass-hover-border:  rgba(0,0,0,0.16);
+  }
+
+  /* Blob radials — gradient stop colors can't be CSS variables */
+  .blob-1 { background: radial-gradient(circle, rgba(23,147,209,0.08) 0%, transparent 65%) }
+  .blob-2 { background: radial-gradient(circle, rgba(80,40,180,0.06) 0%, transparent 65%) }
+  .blob-3 { background: radial-gradient(circle, rgba(23,147,209,0.04) 0%, transparent 65%) }
+
+  /* Grid — softer on light canvas */
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(23,147,209,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23,147,209,0.018) 1px, transparent 1px);
+  }
+
+  /* Deep shadows must invert — can't express rgba(0,0,0,0.7) via a variable */
+  .anim-frame {
+    box-shadow:
+      0 0 0 1px rgba(23,147,209,0.10),
+      0 32px 60px rgba(0,0,0,0.09),
+      0 0 60px rgba(23,147,209,0.05);
+  }
+  .browser-wrap {
+    box-shadow:
+      0 0 0 1px rgba(23,147,209,0.08),
+      0 32px 60px rgba(0,0,0,0.09),
+      0 0 60px rgba(23,147,209,0.05);
+  }
+
+  /* Cards: hairline shadow so they lift off the light background */
+  .feat-card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .feat-card:hover {
+    box-shadow: 0 12px 40px rgba(23,147,209,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .compare-card,
+  .prose-block {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  /* Reduce glow intensity — keep presence, lose bloom on light backgrounds */
+  .stat-n { text-shadow: 0 0 16px rgba(23,147,209,0.22) }
+  .hero-headline .hl-accent { filter: drop-shadow(0 0 20px rgba(23,147,209,0.28)) }
+  .compare-size-num.n-devos { text-shadow: 0 0 24px rgba(23,147,209,0.28) }
+}
 </style>
 </head>
 <body>
@@ -789,7 +898,7 @@ footer {
     </h1>
 
     <p class="hero-sub">
-      Arch Linux, fully configured for Intel MacBooks. Boot from USB and try everything before you install — LibreOffice, GIMP, Brave, the full terminal stack. No commitment, no cables, no terminal required.
+      Arch Linux, fully configured for Intel MacBooks. Boot from USB and try everything before you install — LibreOffice, GIMP, Inkscape, Brave, the full terminal stack. No commitment, no cables, no terminal required.
     </p>
 
     <div class="hero-ctas">
