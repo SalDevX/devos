@@ -8,6 +8,21 @@ STAMP=/var/lib/devos/firstboot-done
 [ -e "$STAMP" ] && exit 0
 mkdir -p /var/lib/devos
 
+# Give this machine its own pacman keyring. DevOS installs by cloning the live
+# ISO, so /etc/pacman.d/gnupg is the keyring built in the ISO chroot (shared
+# master key + a trust db that can leave NEW package installs failing PGP
+# verification — "unknown trust" — even though `pacman -Syu` works, since the
+# archlinux-keyring upgrade hook refreshes tracked keys). This is the Arch Wiki
+# "reset all the keys" procedure. pacman-key reads /etc/pacman.conf for gpgdir,
+# so guard on its presence; --populate is offline (reads the local
+# archlinux-keyring package). No `pacman -Sy` here — that needs network, and a
+# normal `pacman -Syu` already pulls keys added after the ISO was built.
+# Runs once (firstboot stamp); wrapped so a failure can't block the rest.
+if command -v pacman-key >/dev/null 2>&1 && [ -f /etc/pacman.conf ]; then
+  rm -rf /etc/pacman.d/gnupg
+  pacman-key --init && pacman-key --populate archlinux || true
+fi
+
 is_apple() { dmidecode -s system-manufacturer 2>/dev/null | grep -qi apple; }
 is_intel() { grep -qi GenuineIntel /proc/cpuinfo 2>/dev/null; }
 

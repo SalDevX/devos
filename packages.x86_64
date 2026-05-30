@@ -173,6 +173,7 @@ xfce4-clipman-plugin
 
 # --- App Menu (Global Menu) --------------------------------------------------
 appmenu-gtk-module
+mugshot
 
 # --- Compositor & Visual -----------------------------------------------------
 picom
@@ -207,6 +208,7 @@ ttf-jetbrains-mono-nerd
 ttf-ubuntu-font-family
 noto-fonts
 noto-fonts-emoji
+rofimoji
 
 # --- File Manager ------------------------------------------------------------
 thunar
