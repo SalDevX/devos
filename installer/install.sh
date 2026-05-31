@@ -88,7 +88,14 @@ chmod 0440 "$ROOT/etc/sudoers.d/wheel"
 # hooks, keep Plymouth for the installed system).
 rm -f "$ROOT/etc/mkinitcpio.conf.d/archiso.conf"
 cat > "$ROOT/etc/mkinitcpio.conf.d/devos.conf" << 'MKINITCPIO'
+# Early KMS: force i915 so the Intel framebuffer is up before Plymouth (else the
+# boot splash is black until the GPU driver loads lazily). Mirror of devossetup.
+MODULES=(i915)
 HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard keymap consolefont block filesystems fsck)
+# Force the plymouth `script` renderer into the initramfs — the plymouth hook
+# bundles the devos theme files but not its engine, so without this the script
+# theme boots black. Mirror of devossetup.INSTALLED_HOOKS.
+BINARIES=(/usr/lib/plymouth/script.so)
 MKINITCPIO
 
 sed -i 's/^#\(en_US\.UTF-8 UTF-8\)/\1/' "$ROOT/etc/locale.gen"

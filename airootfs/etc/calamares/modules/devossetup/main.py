@@ -38,12 +38,17 @@ SERVICES = (
     "tlp",
 )
 
-# mkinitcpio HOOKS for the installed system: no archiso/memdisk/pxe hooks;
-# autodetect replaces the live vmwgfx/vboxvideo MODULES. Canonical — mirrored
-# by install.sh.
+# mkinitcpio config for the installed system: no archiso/memdisk/pxe hooks.
+# MODULES=(i915) forces EARLY KMS so the Intel framebuffer is up before Plymouth
+# starts — lazy udev/autodetect loading lands after the boot-splash window, so on a
+# real Mac the splash was black at boot (only showing at shutdown once i915 was up).
+# The BINARIES line forces the plymouth `script` renderer into the initramfs (the
+# hook bundles the theme files but not its engine). Canonical — mirrored by install.sh.
 INSTALLED_HOOKS = (
+    "MODULES=(i915)\n"
     "HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard "
     "keymap consolefont block filesystems fsck)\n"
+    "BINARIES=(/usr/lib/plymouth/script.so)\n"
 )
 
 WHEEL_SUDOERS = "%wheel ALL=(ALL:ALL) ALL\n"
