@@ -1,16 +1,5 @@
-# DevOS: TTY -> startx -> XFCE. Auto-start X on the first virtual terminal only.
-# plymouth-quit-wait.service expects display-manager.service which never fires in
-# our agetty+startx setup — quit Plymouth here so it releases the VT before X starts.
-if [[ -z ${DISPLAY:-} && ${XDG_VTNR:-0} -eq 1 ]]; then
-  pgrep -x plymouthd >/dev/null 2>&1 && plymouth deactivate 2>/dev/null
-  clear
-  startx &>/tmp/devos-startx.log
-  pgrep -x plymouthd >/dev/null 2>&1 && plymouth quit 2>/dev/null
-  # X has exited. With no display manager, tty1 becomes visible for a moment on
-  # the way out. If the system is shutting down/rebooting, clear it and idle
-  # silently so no shell prompt or stray text flashes before the (dark) Plymouth
-  # shutdown screen. On a normal logout the system is still "running", so we fall
-  # through to the login shell as usual.
-  clear
-  [[ "$(systemctl is-system-running 2>/dev/null)" == stopping ]] && exec sleep 30
-fi
+# DevOS: graphical login is handled by SDDM (display-manager.service), which
+# launches the XFCE session directly and owns the Plymouth->session and
+# session->shutdown handoffs. This file intentionally does NOT auto-start X on
+# console login anymore. If you ever need X without the display manager (e.g.
+# SDDM disabled), run `startx` by hand.

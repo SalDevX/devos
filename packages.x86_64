@@ -59,6 +59,7 @@ inetutils
 net-tools
 strace
 xsel
+lolcat
 
 # --- Text Editors ------------------------------------------------------------
 neovim
@@ -75,6 +76,7 @@ lshw
 acpi
 acpid
 smartmontools
+baobab
 powertop
 nethogs
 tcpdump
@@ -238,6 +240,14 @@ karchive
 kconfig
 kcrash
 kpackage
+
+# --- Display manager (SDDM macOS-style greeter) ------------------------------
+# Login is SDDM with the in-tree devos Qt6 theme (airootfs/usr/share/sddm/themes
+# /devos). Qt6 runtime comes in via calamares' KF6 deps above; the theme uses
+# QtQuick.Effects (qt6-declarative). NOTE: Arch's Qt6 sddm daemon launches the
+# Qt5 sddm-greeter by default — DevOS forces the Qt6 greeter via a pacman hook
+# (airootfs/etc/pacman.d/hooks/zz-devos-sddm-qt6-greeter.hook) + customize_airootfs.
+sddm
 
 # --- Media -------------------------------------------------------------------
 mpv

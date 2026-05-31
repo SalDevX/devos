@@ -122,6 +122,9 @@ def run():
         _enable(["enable", svc])
     _enable(["--global", "enable", "libinput-gestures.service"])
     _enable(["enable", "devos-firstboot.service"])
+    # Display manager: the installed system shows the SDDM greeter. (The live
+    # autologin is stripped by devoscleanup so installed machines prompt.)
+    _enable(["enable", "sddm"])
 
     # 4. wheel sudoers rule.
     _write(os.path.join(root, "etc/sudoers.d/wheel"), WHEEL_SUDOERS, 0o440)

@@ -1,0 +1,13 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/bin/sddm-greeter
+
+[Action]
+# Arch's Qt6 sddm daemon launches the Qt5 /usr/bin/sddm-greeter by default, which
+# fails (exit 127) on DevOS — there is no Qt5 runtime. Re-point it at the Qt6
+# greeter after sddm is installed or upgraded. Named zz-* so it runs last.
+Description = DevOS: force the Qt6 SDDM greeter (no Qt5 runtime on DevOS)
+When = PostTransaction
+Exec = /usr/bin/ln -sf /usr/bin/sddm-greeter-qt6 /usr/bin/sddm-greeter

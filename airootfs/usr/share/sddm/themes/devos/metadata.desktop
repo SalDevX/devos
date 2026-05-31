@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=DevOS
+Description=DevOS macOS-style greeter — dark, Geist, no Plasma (Qt6)
+Author=DevOS
+License=GPL-3.0-or-later
+Type=sddm-theme
+Version=1.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-API=2.0

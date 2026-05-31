@@ -1,0 +1,14 @@
+# DevOS: environment for SDDM-launched X sessions.
+#
+# SDDM's Xsession sources /etc/xprofile before exec'ing the session, but it does
+# NOT source ~/.xinitrc — so the exports that .xinitrc used to provide (and the
+# optional per-machine display hook) are replicated here. Without this the logind
+# session is mislabelled and per-machine xrandr/scaling never runs.
+export XDG_SESSION_TYPE=x11
+export XDG_SESSION_DESKTOP=xfce
+export XDG_CURRENT_DESKTOP=XFCE
+export DESKTOP_SESSION=xfce
+
+# Optional per-machine display setup (resolution, scaling). Create this script to
+# run xrandr etc.; nothing is hardcoded so the image stays hardware-agnostic.
+[ -x "$HOME/.config/devos/display.sh" ] && "$HOME/.config/devos/display.sh"

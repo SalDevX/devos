@@ -50,7 +50,6 @@ xfwm4-themes                    # Extra window decoration themes for xfwm4
 # --- Fonts (AUR) -------------------------------------------------------------
 ttf-ms-fonts                    # Microsoft core fonts: Arial, Times New Roman, etc.
 bdf-unifont                     # GNU Unifont BDF format (calamares installer font)
-urw                             # URW++ font collection (PDF/print quality)
 
 # --- XFCE Extras -------------------------------------------------------------
 menulibre                       # Freedesktop menu editor (.desktop files)
