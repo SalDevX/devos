@@ -8,6 +8,22 @@
 Window.SetBackgroundTopColor(0.067, 0.067, 0.067);
 Window.SetBackgroundBottomColor(0.067, 0.067, 0.067);
 
+// plymouth's script Math library has NO Round() — only Int/Abs/Min/Max/Clamp/
+// Sqrt/Pi/Cos/Sin/Tan/ATan2/Random (verified in script.so). The old code called
+// Math.Round(...), an undefined function returning null, so every sprite below
+// got a null position/size and never drew — only the background (which needs no
+// rounding) painted: the "dark screen, no logo, no bar" symptom. This helper does
+// round-half-up via Math.Int; every argument here is positive, so it is exact.
+fun Round(x) { return Math.Int(x + 0.5); }
+
+// Boot: draw the full DevOS splash. Shutdown/reboot: skip the logo + bar and show
+// only the dark background set above, so it covers the tty shutdown logs with no
+// branding. Plymouth.GetMode() is "shutdown"/"reboot" for those (verified in
+// script.so + plymouthd); anything else (boot, updates, …) still gets the splash.
+mode = Plymouth.GetMode();
+if (mode != "shutdown" && mode != "reboot")
+{
+
 screen_w = Window.GetWidth();
 screen_h = Window.GetHeight();
 
@@ -15,17 +31,17 @@ screen_h = Window.GetHeight();
 title_img    = Image("devos-logo.png");
 title_sprite = Sprite(title_img);
 title_sprite.SetPosition(
-    Math.Round(screen_w / 2 - title_img.GetWidth()  / 2),
-    Math.Round(screen_h * 0.44 - title_img.GetHeight() / 2),
+    Round(screen_w / 2 - title_img.GetWidth()  / 2),
+    Round(screen_h * 0.44 - title_img.GetHeight() / 2),
     10
 );
 
 // --- Progress bar: 30% screen width, 6 px tall, pill-shaped ends ---
-bar_w = Math.Round(screen_w * 0.30);
+bar_w = Round(screen_w * 0.30);
 bar_h = 6;
 cap_w = bar_h;    // end-cap image is bar_h × bar_h (circle)
-bar_x = Math.Round((screen_w - bar_w) / 2);
-bar_y = Math.Round(screen_h * 0.62 - bar_h / 2);
+bar_x = Round((screen_w - bar_w) / 2);
+bar_y = Round(screen_h * 0.62 - bar_h / 2);
 
 // Track (rgba 255,255,255,0.18)
 trk_cap = Image("bar_track_cap.png");
@@ -42,7 +58,7 @@ fill_c = Sprite(fill_mid.Scale(1, bar_h));        fill_c.SetPosition(bar_x + cap
 fill_r = Sprite(fill_cap); fill_r.SetOpacity(0);
 
 fun ProgressCallback(duration, progress) {
-    fill_w = Math.Round(bar_w * progress);
+    fill_w = Round(bar_w * progress);
     if (fill_w < cap_w * 2) {
         fill_l.SetOpacity(0);
         fill_c.SetImage(fill_mid.Scale(1, bar_h));
@@ -61,3 +77,5 @@ fun RefreshCallback() {}
 
 Plymouth.SetBootProgressFunction(ProgressCallback);
 Plymouth.SetRefreshFunction(RefreshCallback);
+
+} // end boot-only splash — shutdown/reboot show just the dark background

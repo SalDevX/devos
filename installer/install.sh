@@ -130,6 +130,12 @@ rm -f "$ROOT/usr/local/bin/devos-calamares"
 # normal login prompt. (devoscleanup does the same for the GUI path.)
 rm -f "$ROOT/etc/systemd/system/getty@tty1.service.d/autologin.conf"
 rmdir "$ROOT/etc/systemd/system/getty@tty1.service.d" 2>/dev/null || true
+# devos-firstboot run stamp leaked from the live boot (the live ISO enables
+# devos-firstboot.service, which writes this stamp, and the rsync copied it).
+# Left in place it makes firstboot SKIP on the real machine -> the per-machine
+# pacman keyring reset never runs -> new package installs fail PGP verification.
+# (devoscleanup does the same for the GUI path.)
+rm -f "$ROOT/var/lib/devos/firstboot-done"
 
 # The CLI path keeps the live 'user' account, but its home was excluded from the
 # copy — recreate it from skel so login + startx work.

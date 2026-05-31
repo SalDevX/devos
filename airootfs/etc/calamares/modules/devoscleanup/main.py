@@ -40,6 +40,15 @@ _REMOVE_FILES = (
     # not copied, so on the installed disk this would autologin into a missing
     # home and break startx. Removing it gives a normal login prompt.
     "etc/systemd/system/getty@tty1.service.d/autologin.conf",
+    # devos-firstboot run stamp. The live ISO enables devos-firstboot.service
+    # (customize_airootfs.sh), so it runs on the live boot and writes this stamp;
+    # the rsync then copies it onto the target. Left in place, the service's
+    # ConditionPathExists=!/var/lib/devos/firstboot-done makes firstboot SKIP on
+    # the real machine's first boot -> the per-machine pacman keyring reset never
+    # runs -> installing NEW packages fails PGP verification ("unknown trust")
+    # until the user runs pacman-key by hand. Removing it lets firstboot run once
+    # on real hardware. (firstboot itself is re-enabled on the target by devossetup.)
+    "var/lib/devos/firstboot-done",
 )
 
 # Live-only directories to delete recursively (relative to rootMountPoint).
