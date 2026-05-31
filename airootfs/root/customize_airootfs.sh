@@ -50,10 +50,17 @@ chmod 0440 /etc/sudoers.d/wheel
 visudo -cf /etc/sudoers.d/wheel >/dev/null   # syntax-check; aborts build if invalid
 
 # ----------------------------------------------------------------------
-# Login is handled by SDDM (see the Display manager block below). No agetty
-# autologin drop-in: SDDM Conflicts=getty@tty1 and auto-logs the live user
-# straight into XFCE itself via /etc/sddm.conf.d/devos.conf [Autologin].
+# Autologin user on tty1 -> ~/.zprofile shows the MOTD once, then runs startx.
+# The live ISO has NO display manager: SDDM is shipped in the squashfs but is
+# enabled ONLY on the installed target by the Calamares installer (devossetup /
+# install.sh), never on the live boot. Remove this drop-in for a normal login.
 # ----------------------------------------------------------------------
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat >/etc/systemd/system/getty@tty1.service.d/autologin.conf <<'EOF'
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin user --noclear %I $TERM
+EOF
 
 # ----------------------------------------------------------------------
 # Always-on, hardware-agnostic services.
@@ -72,18 +79,12 @@ systemctl --global enable libinput-gestures.service >/dev/null 2>&1 || true
 # are enabled at FIRST BOOT on the real target, not here.
 systemctl enable devos-firstboot.service >/dev/null 2>&1 || true
 
-# ----------------------------------------------------------------------
-# Display manager: SDDM with the DevOS macOS-style greeter. SDDM owns login
-# (Conflicts=getty@tty1), so there is no agetty autologin / .zprofile startx.
-#
-# Arch's Qt6 sddm daemon launches the *Qt5* /usr/bin/sddm-greeter by default,
-# which exits 127 on DevOS (no Qt5 runtime). Point it at the Qt6 greeter. The
-# pacman hook (/etc/pacman.d/hooks/zz-devos-sddm-qt6-greeter.hook) re-applies this
-# after future sddm upgrades, but it cannot fire during THIS build (the airootfs
-# overlay lands after pacman installs sddm), so do it explicitly here.
-# ----------------------------------------------------------------------
-ln -sf /usr/bin/sddm-greeter-qt6 /usr/bin/sddm-greeter
-systemctl enable sddm >/dev/null 2>&1 || true
+# NOTE: SDDM (the macOS greeter) is intentionally NOT enabled on the live ISO.
+# The live boot stays agetty->startx->XFCE (which auto-launches Calamares). The
+# Calamares installer (devossetup / install.sh) enables sddm, sets
+# graphical.target, and points the greeter at the Qt6 binary on the INSTALLED
+# system only — so the live ISO never shows the greeter and never autologins via
+# a display manager.
 
 # ----------------------------------------------------------------------
 # Live ISO: sudoers rule so the live user can launch Calamares without a

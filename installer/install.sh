@@ -80,10 +80,13 @@ for svc in NetworkManager systemd-resolved systemd-timesyncd \
 done
 arch-chroot "$ROOT" systemctl --global enable libinput-gestures.service 2>/dev/null || true
 arch-chroot "$ROOT" systemctl enable devos-firstboot.service 2>/dev/null || true
-# Display manager: installed system shows the SDDM greeter (autologin stripped
-# below). Mirror of devossetup. (The Qt6-greeter symlink + pacman hook come over
-# in the rsync from the live system.)
+# Display manager: the INSTALLED system shows the SDDM greeter (the live ISO does
+# NOT run sddm). Enable it, boot to graphical.target, and point the greeter at
+# the Qt6 binary (Arch's Qt6 daemon launches the Qt5 one -> exit 127 on DevOS).
+# Mirror of devossetup.
 arch-chroot "$ROOT" systemctl enable sddm 2>/dev/null || true
+arch-chroot "$ROOT" systemctl set-default graphical.target 2>/dev/null || true
+ln -sf /usr/bin/sddm-greeter-qt6 "$ROOT/usr/bin/sddm-greeter"
 
 echo '%wheel ALL=(ALL:ALL) ALL' > "$ROOT/etc/sudoers.d/wheel"
 chmod 0440 "$ROOT/etc/sudoers.d/wheel"
@@ -140,18 +143,6 @@ rmdir "$ROOT/etc/systemd/system/getty@tty1.service.d" 2>/dev/null || true
 # pacman keyring reset never runs -> new package installs fail PGP verification.
 # (devoscleanup does the same for the GUI path.)
 rm -f "$ROOT/var/lib/devos/firstboot-done"
-# Strip the live SDDM [Autologin] so the installed system shows the greeter.
-# Mirror of devoscleanup._disable_live_autologin / _INSTALLED_SDDM_CONF.
-if [ -f "$ROOT/etc/sddm.conf.d/devos.conf" ]; then
-  cat > "$ROOT/etc/sddm.conf.d/devos.conf" << 'SDDMCONF'
-# DevOS SDDM configuration — installed system (greeter, no autologin).
-[Theme]
-Current=devos
-
-[General]
-DisplayServer=x11
-SDDMCONF
-fi
 
 # The CLI path keeps the live 'user' account, but its home was excluded from the
 # copy — recreate it from skel so login + startx work.

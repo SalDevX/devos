@@ -122,9 +122,22 @@ def run():
         _enable(["enable", svc])
     _enable(["--global", "enable", "libinput-gestures.service"])
     _enable(["enable", "devos-firstboot.service"])
-    # Display manager: the installed system shows the SDDM greeter. (The live
-    # autologin is stripped by devoscleanup so installed machines prompt.)
+
+    # Display manager: the INSTALLED system shows the SDDM greeter. SDDM is NOT
+    # enabled on the live ISO (that stays agetty->startx), so enable it here and
+    # switch the default target to graphical so the greeter actually starts.
     _enable(["enable", "sddm"])
+    _enable(["set-default", "graphical.target"])
+    # Arch's Qt6 sddm daemon launches the Qt5 /usr/bin/sddm-greeter by default,
+    # which exits 127 on DevOS (no Qt5 runtime). Point it at the Qt6 greeter.
+    # (The pacman hook re-applies this after future sddm upgrades.)
+    greeter = os.path.join(root, "usr/bin/sddm-greeter")
+    try:
+        if os.path.islink(greeter) or os.path.exists(greeter):
+            os.remove(greeter)
+        os.symlink("/usr/bin/sddm-greeter-qt6", greeter)
+    except OSError as e:
+        libcalamares.utils.warning("devossetup: sddm-greeter symlink failed: " + str(e))
 
     # 4. wheel sudoers rule.
     _write(os.path.join(root, "etc/sudoers.d/wheel"), WHEEL_SUDOERS, 0o440)
