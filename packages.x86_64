@@ -230,6 +230,11 @@ usbmuxd
 kpmcore
 parted
 dosfstools
+# cryptsetup — LUKS: the Calamares partition job creates/opens the container
+# (shells out to cryptsetup) AND the target's `encrypt` initramfs hook needs it;
+# required in the squashfs (live ISO + rsynced target). NOTE: bare line, no inline
+# comment — mkarchiso's `sed s/#.*//` would leave a trailing space → "target not found".
+cryptsetup
 arch-install-scripts
 
 # --- Calamares runtime deps (KF6 — omitted from AUR PKGBUILD) ----------------
