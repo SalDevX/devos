@@ -7,18 +7,28 @@ Status: planned (Phase 1). Branch: `fix/luks-install`. **No ISO rebuild in this 
 DevOS has **no working full-disk-encryption path** — not regressed, never wired end-to-end.
 A source-level audit of the installer (GUI Calamares + CLI `install.sh`) plus the pinned
 upstream Calamares **3.4.2** module sources found the stock encrypted chain is complete and
-correct; DevOS breaks it at exactly **two** points:
+correct. There is exactly **one** gating breaker, plus a defense-in-depth hygiene item:
 
-1. **`cryptsetup` is not shipped.** The C++ `partition` job shells out to the `cryptsetup`
-   binary to create/open the LUKS container and read its UUID
-   (`partition/jobs/FillGlobalStorageJob.cpp:70,133-134`; `ClearMountsJob.cpp:331`). It is
-   absent from `packages.x86_64` and not pulled by `base`/`mkinitcpio`/calamares deps, so the
-   live installer can't create LUKS **and** the target initramfs can't build the `encrypt` hook.
-2. **DevOS's hardcoded mkinitcpio HOOKS override defeats Calamares.** `initcpiocfg` correctly
-   adds the `encrypt` hook for a LUKS root, but `devossetup` (and its `install.sh` mirror)
-   write `/etc/mkinitcpio.conf.d/devos.conf` with a fixed `HOOKS=` that has no `encrypt`. A
-   `conf.d` drop-in overrides the main config, so the encrypt hook is discarded → an encrypted
-   root that can't be unlocked → unbootable.
+1. **(GATING) DevOS's hardcoded mkinitcpio HOOKS override defeats Calamares.** `initcpiocfg`
+   correctly adds the `encrypt` hook for a LUKS root, but `devossetup` (and its `install.sh`
+   mirror) write `/etc/mkinitcpio.conf.d/devos.conf` with a fixed `HOOKS=` that has no
+   `encrypt`. A `conf.d` drop-in overrides the main config, so the encrypt hook is discarded →
+   an encrypted root that can't be unlocked → unbootable. **This is the sole load-bearing fix
+   (C2).**
+2. **(HYGIENE, not gating) `cryptsetup` is implicit.** The C++ `partition` job shells out to
+   the `cryptsetup` binary (`partition/jobs/FillGlobalStorageJob.cpp:70,133-134`;
+   `ClearMountsJob.cpp:331`), and the target initramfs `encrypt` hook needs it. It is **not**
+   an explicit line in `packages.x86_64` — **but the pre-rebuild live probe found it is already
+   in the ISO**, pulled transitively (systemd's `libcryptsetup.so` dependency; `/usr/bin/cryptsetup`
+   + `libcryptsetup.so.12` + the systemd cryptsetup token plugins are all in the built
+   `airootfs.sfs`). So C1 (add it explicitly) is **not** the gating fix originally assumed —
+   it just makes the dependency intentional rather than relying on systemd to keep pulling it.
+
+> **Failure-mode correction:** because cryptsetup is already present, the partition module's
+> "Encrypt system" checkbox is almost certainly **already enabled** on the current ISO. So a
+> user can tick it, set a passphrase, install — and get a **silently unbootable** system (the
+> encrypt hook is stripped). The original audit framed this as "encryption unavailable"; it is
+> actually "encryption appears to work but is broken," which raises C2's user-impact severity.
 
 Everything else in the stock chain is present and verified: `partition` seeds
 `luksMapperName`/`luksUuid`; `mount` mounts the already-open mapper; `fstab` writes
@@ -35,31 +45,40 @@ root=/dev/mapper/<mapper>` for the udev `encrypt` hook (`bootloader/main.py:141,
 
 ---
 
-## Pre-rebuild live probe (run on the CURRENT, unfixed ISO before `mkarchiso`)
+## Pre-rebuild live probe — DONE (headless artifact check)
 
-Cheap confirmation that C1 is the gating fix, with no rebuild:
+**Run + result (2026-06-10):** `unsquashfs -l` of the built `out/devos-2026.05.27-x86_64.iso`
+→ `airootfs.sfs` shows **`/usr/bin/cryptsetup` + `/usr/lib/libcryptsetup.so.12`** already
+present (transitive systemd dep; the `cryptsetup-token-systemd-*.so` plugins are there too).
+`cryptsetup` is *not* an explicit line in `packages.x86_64`, yet ships anyway.
 
-1. Boot the current DevOS ISO under UEFI (OVMF) to the live XFCE session.
-2. `sudo pacman -Sy cryptsetup`  — pull cryptsetup into the **live session only** (not the ISO).
-3. Launch Calamares (the "Install DevOS" launcher / `devos-calamares`).
-4. Go to Partitions → "Erase disk" and confirm the **"Encrypt system" checkbox is now enabled**
-   (un-greyed) and accepts a passphrase.
-5. Enabled → C1 (ship cryptsetup) is the gating fix; cancel the install. Still greyed → escalate
-   (the calamares build/kpmcore lacks LUKS support — re-check the PKGBUILD skip-list) before
-   rebuilding.
+**Conclusion:** C1 is **not** gating — cryptsetup is already in the ISO. The "Encrypt system"
+checkbox is therefore almost certainly **already enabled** on the current ISO, so step 2 below
+(`pacman -Sy cryptsetup`) would be a **no-op**. The live GUI probe no longer tests C1; the
+decisive empirical test moves to **T2 on the FIXED ISO** (does the encrypted install now boot —
+i.e. did C2 put the `encrypt` hook into the GUI-built initramfs).
+
+Optional GUI confirmation (maintainer, at a display) on the **current** ISO — expect the
+checkbox already enabled, no `pacman` needed:
+
+1. Boot `out/devos-2026.05.27-x86_64.iso` under UEFI (OVMF) to the live session.
+2. Launch Calamares → Partitions → "Erase disk" → confirm **"Encrypt system" is already enabled**
+   and accepts a passphrase, then cancel. (If unexpectedly greyed → escalate: kpmcore/calamares
+   LUKS support, re-check the PKGBUILD skip-list.)
 
 ---
 
 ## Changes (one commit each; smallest-first)
 
-> All paths are in the `devos/` repo. `cryptsetup` lands in the squashfs, so it is present both
-> on the live ISO (partition job) and in the target (encrypt-hook build). C1+C2 must ship
-> together for encryption to function; each is independently safe.
+> All paths are in the `devos/` repo. **C2 is the load-bearing fix**; C1 is hygiene (cryptsetup
+> is already in the squashfs transitively — see the probe above). Each change is independently
+> safe.
 
-### C1 — Ship `cryptsetup` · `packages.x86_64` · ISO rebuild
-Adds the LUKS toolchain. `lvm2` intentionally not added (plain ext4-on-LUKS, no LVM).
-**Risk:** none functional — additive dependency; SEC-04 clean (official core package), DEVOS-04
-not a MusicOS pattern. Slightly larger squashfs.
+### C1 — Declare `cryptsetup` explicitly · `packages.x86_64` · ISO rebuild
+Already present transitively (systemd); this makes the dependency intentional so encryption
+doesn't silently break if systemd ever stops pulling it. **Not the gating fix.** `lvm2` not
+added (plain ext4-on-LUKS). **Risk:** none functional — additive/no-op (package already
+installed); SEC-04 clean (official core package), DEVOS-04 not a MusicOS pattern.
 
 ### C2 — Add the `encrypt` hook · `devossetup/main.py` (`INSTALLED_HOOKS`) + `installer/install.sh` (HOOKS line) · ISO rebuild
 Insert `encrypt` after `block`, before `filesystems`. Ordering verified safe (plymouth,
