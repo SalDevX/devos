@@ -46,8 +46,12 @@ SERVICES = (
 # hook bundles the theme files but not its engine). Canonical — mirrored by install.sh.
 INSTALLED_HOOKS = (
     "MODULES=(i915)\n"
+    # `encrypt` (after block, before filesystems) unlocks a LUKS root at boot.
+    # It is a no-op when the install is unencrypted (no cryptdevice= on the
+    # cmdline), so it is safe to ship unconditionally. This drop-in overrides
+    # initcpiocfg's computed HOOKS, so the hook must be listed here or it is lost.
     "HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard "
-    "keymap consolefont block filesystems fsck)\n"
+    "keymap consolefont block encrypt filesystems fsck)\n"
     "BINARIES=(/usr/lib/plymouth/script.so)\n"
 )
 
