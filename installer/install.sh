@@ -30,6 +30,16 @@ ROOT=/mnt
 mountpoint -q "$ROOT"      || { echo "Mount your target root at /mnt first."; exit 1; }
 mountpoint -q "$ROOT/boot" || { echo "Mount your EFI System Partition at /mnt/boot first."; exit 1; }
 
+# This CLI installer does not support encrypted (LUKS) targets: it writes a plain
+# root=PARTUUID= loader entry (no cryptdevice=), and a /dev/mapper root has no
+# PARTUUID — the result would be silently unbootable. Refuse and point at the GUI,
+# which handles full-disk encryption end to end.
+if [[ "$(findmnt -no SOURCE "$ROOT")" == /dev/mapper/* ]]; then
+    echo "ERROR: install.sh does not support encrypted (LUKS) targets." >&2
+    echo "       Use the Calamares GUI installer for full-disk encryption." >&2
+    exit 1
+fi
+
 read -rp "This will install DevOS onto /mnt by copying the live system. Continue? [y/N] " ok
 [[ ${ok,,} == y ]] || exit 1
 
