@@ -1,0 +1,32 @@
+#!/bin/sh
+# DevOS: publish the user's account picture (~/.face) to the SDDM login screen.
+#
+# Mugshot and the Calamares user setup (users.conf avatarFilePath=.face) store
+# the account picture at ~/.face. But the greeter runs as the unprivileged
+# `sddm` user before anyone logs in, so it cannot read a 0700 home, and SDDM
+# resolves each user's avatar from <FacesDir>/<username>.face.icon -- never from
+# ~/.face. So this session helper copies ~/.face into
+# /var/lib/devos/faces/<username>.face.icon (root:wheel 2775 dir, 0664 file) --
+# a path the greeter CAN read and any wheel user CAN write, so no polkit/sudo is
+# needed. FacesDir is pointed there by /etc/sddm.conf.d/devos.conf. It runs once
+# per session at login; an avatar changed mid-session shows up at the next login.
+#
+# Started per session by ~/.config/autostart/devos-sddm-avatar-sync.desktop.
+# Runs as the user; no arguments.
+
+SRC="$HOME/.face"
+DIR=/var/lib/devos/faces
+USR=$(id -un)
+DST="$DIR/$USR.face.icon"
+
+[ -n "$USR" ]   || exit 0
+[ -r "$SRC" ]   || exit 0   # no avatar set -> greeter shows its initial-letter fallback
+[ -w "$DIR" ]   || exit 0   # perms not provisioned for this user -> nothing to do
+
+# Atomic publish: temp file in the same (setgid wheel) dir, then rename, so a
+# logout mid-copy can't leave the greeter a half-written image. The 2775/setgid
+# dir gives the temp file the wheel group automatically.
+tmp="$DST.tmp.$$"
+cp -f "$SRC" "$tmp" 2>/dev/null || { rm -f "$tmp"; exit 0; }
+chmod 0664 "$tmp" 2>/dev/null
+mv -f "$tmp" "$DST" 2>/dev/null || rm -f "$tmp"

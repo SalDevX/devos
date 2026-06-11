@@ -1,0 +1,27 @@
+#!/bin/sh
+# DevOS brcmfmac loader — capability-keyed BCM43602 Wi-Fi workaround.
+#
+# The 2016/2017 MacBook Pro's Wi-Fi is a Broadcom BCM43602 (PCI 14e4:43ba). Its
+# firmware advertises a WPA 4-way-handshake offload that is BROKEN on this chip
+# (kernel bug 202521): the card associates but the handshake times out, so it can
+# never join a WPA network. brcmfmac's `feature_disable=0x82000` turns that offload
+# off, so wpa_supplicant does the handshake in software — which works (verified on
+# a real 2017 15" MacBook Pro / MacBookPro14,3).
+#
+# Other MacBook Wi-Fi chips (2013-2015: BCM4360 etc.) do NOT need this and work
+# fine without it, so the option is added ONLY when a 43602 is actually present.
+# Hardware-keyed, not model-keyed — one ISO boots correctly on every MacBook.
+#
+# Wired via `install brcmfmac` in /etc/modprobe.d/brcmfmac.conf, which runs this
+# instead of loading the module directly. `--ignore-install` makes the inner
+# modprobe skip that rule and load the real module (no recursion). $CMDLINE_OPTS
+# carries through any options a caller passed to `modprobe brcmfmac`.
+opts=
+for dev in /sys/bus/pci/devices/*; do
+    [ -r "$dev/vendor" ] && [ -r "$dev/device" ] || continue
+    if [ "$(cat "$dev/vendor")" = "0x14e4" ] && [ "$(cat "$dev/device")" = "0x43ba" ]; then
+        opts="feature_disable=0x82000"   # BCM43602: disable the broken handshake offload
+        break
+    fi
+done
+exec /usr/bin/modprobe --ignore-install brcmfmac $opts $CMDLINE_OPTS

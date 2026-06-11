@@ -1,0 +1,7 @@
+# DevOS Touch Bar: the Apple iBridge (T1/T2 Touch Bar bridge) fails to initialise if
+# usbmuxd is running. The MOMENT the iBridge enumerates, pull in a oneshot that masks
+# usbmuxd (transiently) and reloads the iBridge driver — this runs in the device-add
+# timeline, so it wins the race in the LIVE ISO where firstboot's mask was too late.
+# Capability-gated to the iBridge by product string, so iPhones/iPads keep usbmuxd and
+# non-Touch-Bar machines are untouched. (Product string needs on-HW confirmation.)
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="05ac", ATTR{product}=="iBridge", TAG+="systemd", ENV{SYSTEMD_WANTS}+="devos-touchbar-init.service"

@@ -1,0 +1,99 @@
+#!/bin/sh
+# devos-wifi-firmware — stage the Broadcom Mac Wi-Fi firmware that Arch's
+# linux-firmware does NOT ship and Apple does NOT allow redistributing:
+#   BCM4364 (0x4464) — 2016/2017 MacBook Pro
+#   BCM4377 (0x4488) — T2 Macs (2018-2020)
+#   BCM4378 (0x4425) — later T2 / M1
+#
+# Runs at boot BEFORE devos-wifi-driver loads brcmfmac (so the card binds WITH
+# firmware), and is safe to run by hand any time. Three outcomes, in order:
+#   1. Firmware already in /lib/firmware/brcm/  -> nothing to do (e.g. a PRIVATE
+#      build that baked it into airootfs/usr/lib/firmware/brcm/ — see the .gitignore
+#      there; that is the only zero-effort, no-redistribution path).
+#   2. Firmware staged on a FAT/exFAT volume (USB stick or the Apple EFI partition)
+#      under  /devos-firmware/brcm/<files>  or  /devos-firmware/firmware.tar
+#      -> copy it in, reload brcmfmac, Wi-Fi comes up mid-session.
+#   3. Nothing found -> print how to extract it and exit cleanly (never blocks).
+#
+# To produce the blobs: boot the Mac's own macOS and run Asahi's extractor from the
+# repo ROOT (the dir that contains asahi_firmware/) —
+#   git clone https://github.com/AsahiLinux/asahi-installer
+#   cd asahi-installer
+#   python3 -m asahi_firmware.wifi /usr/share/firmware/wifi firmware.tar
+# then drop firmware.tar (or the unpacked brcmfmac4364*/4377* files) into a folder
+# named  devos-firmware/  on a FAT USB stick (or the EFI partition) and reboot DevOS.
+# NOTE: that path/tool is the T2/Apple-Silicon layout. On a 2017 (T1) Mac the
+# BCM4364 firmware may instead live in the macOS AirPortBrcmNIC.kext Resources — if
+# /usr/share/firmware/wifi is empty there, extract from the kext (rename C-4364__s-B2
+# bin/txt/clmb -> brcmfmac4364b2-pcie.{bin,txt,clm_blob}).
+
+set -eu
+FWDIR=/lib/firmware/brcm
+
+# Which Broadcom chip (if any) is on the bus, and its firmware filename prefix.
+fw_prefix=
+for d in /sys/bus/pci/devices/*; do
+    [ -r "$d/vendor" ] && [ -r "$d/device" ] || continue
+    [ "$(cat "$d/vendor")" = 0x14e4 ] || continue
+    case "$(cat "$d/device")" in
+        0x4464) fw_prefix=4364 ;;
+        0x4488) fw_prefix=4377 ;;
+        0x4425) fw_prefix=4378 ;;
+    esac
+    [ -n "$fw_prefix" ] && break
+done
+[ -n "$fw_prefix" ] || exit 0                       # no firmware-needy Broadcom card
+
+# Already present (baked or installed earlier)? done.
+if ls "$FWDIR"/brcmfmac"$fw_prefix"*-pcie.bin >/dev/null 2>&1; then
+    exit 0
+fi
+
+install_from() {                                    # $1 = a dir or a .tar
+    mkdir -p "$FWDIR"
+    case "$1" in
+        *.tar) tar -xf "$1" -C "$FWDIR" 2>/dev/null || return 1 ;;
+        *)     cp -f "$1"/brcmfmac* "$FWDIR"/ 2>/dev/null || return 1 ;;
+    esac
+    ls "$FWDIR"/brcmfmac"$fw_prefix"*-pcie.bin >/dev/null 2>&1
+}
+
+stage() {                                           # echo the payload path under a mount, if any
+    [ -d "$1/devos-firmware/brcm" ] && { echo "$1/devos-firmware/brcm"; return; }
+    [ -f "$1/devos-firmware/firmware.tar" ] && { echo "$1/devos-firmware/firmware.tar"; return; }
+}
+
+# (a) already-mounted removable media / EFI mounts
+payload=
+for base in /run/media/*/* /mnt/* /boot /boot/efi /efi; do
+    [ -e "$base" ] || continue
+    payload="$(stage "$base")" && [ -n "$payload" ] && break || payload=
+done
+
+# (b) actively probe unmounted FAT/exFAT volumes (the USB stick / Apple EFI; no APFS)
+if [ -z "$payload" ] && command -v blkid >/dev/null 2>&1; then
+    for part in $(blkid -t TYPE=vfat -o device 2>/dev/null) $(blkid -t TYPE=exfat -o device 2>/dev/null); do
+        mp=$(mktemp -d)
+        if mount -o ro "$part" "$mp" 2>/dev/null; then
+            payload="$(stage "$mp")" || payload=
+            [ -n "$payload" ] && break
+            umount "$mp" 2>/dev/null || true; rmdir "$mp" 2>/dev/null || true
+        else
+            rmdir "$mp" 2>/dev/null || true
+        fi
+    done
+fi
+
+if [ -n "$payload" ] && install_from "$payload"; then
+    modprobe -r brcmfmac 2>/dev/null || true
+    modprobe brcmfmac 2>/dev/null || true
+    echo "devos-wifi-firmware: installed BCM$fw_prefix firmware from $payload; reloaded brcmfmac."
+    exit 0
+fi
+
+echo "devos-wifi-firmware: this Mac's BCM$fw_prefix Wi-Fi needs firmware that isn't" \
+     "present (Apple's, not in linux-firmware). Extract it from macOS with Asahi's" \
+     "firmware.wifi tool, put the brcmfmac$fw_prefix* files in a 'devos-firmware/brcm/'" \
+     "folder on a FAT USB stick or the EFI partition, and reboot. See" \
+     "/usr/local/bin/devos-wifi-firmware for the exact commands." >&2
+exit 0

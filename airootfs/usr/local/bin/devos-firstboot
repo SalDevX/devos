@@ -31,22 +31,32 @@ if is_apple; then
     mbpfan.service \
     disable-apple-display-audio.service \
     disable-usb-autosuspend.service \
-    disable-wakeup.service 2>/dev/null || true
+    lid-wakeup.service 2>/dev/null || true
 fi
 
 if is_intel; then
   systemctl enable --now thermald.service 2>/dev/null || true
 fi
 
-# Wire firejail to intercept all supported apps via symlinks in /usr/local/bin
-firecfg 2>/dev/null || true
-# Brave has its own security model — remove it from firejail interception
-rm -f /usr/local/bin/brave-browser-stable \
-      /usr/local/bin/brave-browser \
-      /usr/local/bin/brave-browser-beta \
-      /usr/local/bin/brave-browser-dev \
-      /usr/local/bin/brave-browser-nightly \
-      /usr/local/bin/brave 2>/dev/null || true
+# Touch Bar (T1 iBridge, 2016/2017 MacBook Pro): usbmuxd grabs the iBridge USB
+# before the HID driver and stops the Touch Bar from initialising. Mask it ONLY
+# where the iBridge device is actually present (capability-gated, not model-gated —
+# inert on every other machine). Tradeoff: iOS-over-USB stops on those models; the
+# built-in Touch Bar wins. apple-ib-tb itself loads via modules-load.d (no-op when
+# the device is absent), so nothing else here is conditional.
+if grep -qil ibridge /sys/bus/usb/devices/*/product 2>/dev/null; then
+  systemctl mask usbmuxd.service usbmuxd.socket 2>/dev/null || true
+fi
+
+# Sandbox ONLY Chromium with firejail. DevOS is a developer OS, so we deliberately
+# do NOT run `firecfg` — it blanket-symlinks EVERY app that has a firejail profile
+# (VS Code, editors, file managers, …) into the sandbox, which breaks them (the
+# integrated terminal, debuggers, extensions, files outside $HOME, the `code` CLI).
+# One symlink puts only `chromium` behind firejail: /usr/local/bin precedes
+# /usr/bin in PATH, so `chromium` → firejail (loads chromium.profile) → the real
+# /usr/bin/chromium, sandboxed. Brave stays native (it ships Chromium's own
+# sandbox); every other app runs unsandboxed.
+ln -sf /usr/bin/firejail /usr/local/bin/chromium
 
 touch "$STAMP"
 systemctl disable devos-firstboot.service 2>/dev/null || true

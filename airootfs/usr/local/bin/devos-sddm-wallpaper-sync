@@ -1,0 +1,50 @@
+#!/bin/sh
+# DevOS: mirror the user's current desktop wallpaper to the SDDM login screen.
+#
+# The greeter runs as the unprivileged `sddm` user before anyone logs in, so it
+# cannot read /home or a user's XFCE settings. Instead it reads its background
+# from /var/lib/devos/sddm-wallpaper.jpg (root:wheel 2775 dir, 0664 file) — a
+# path the greeter CAN read and any wheel user CAN write, so no polkit/sudo is
+# needed. This session helper copies whatever the user currently has set as their
+# XFCE wallpaper into that file: once at login, then on every change. Result: the
+# login screen always tracks the desktop wallpaper, one login behind at worst.
+#
+# Started per session by ~/.config/autostart/devos-sddm-wallpaper-sync.desktop.
+# Runs as the user, with $DISPLAY / xfconf available; no arguments.
+
+DST=/var/lib/devos/sddm-wallpaper.jpg
+DIR=$(dirname "$DST")
+
+command -v xfconf-query >/dev/null 2>&1 || exit 0
+command -v xrandr       >/dev/null 2>&1 || exit 0
+[ -w "$DIR" ] || exit 0    # perms not provisioned for this user -> nothing to do
+
+# The wallpaper of the primary (else first) connected output — what the user sees.
+current_wallpaper() {
+    out=$(xrandr --query 2>/dev/null | awk '/ connected primary/ {print $1; exit}')
+    [ -n "$out" ] || out=$(xrandr --query 2>/dev/null | awk '/ connected/ {print $1; exit}')
+    [ -n "$out" ] || return 1
+    xfconf-query -c xfce4-desktop \
+        -p "/backdrop/screen0/monitor${out}/workspace0/last-image" 2>/dev/null
+}
+
+sync_once() {
+    img=$(current_wallpaper) || return 0
+    [ -n "$img" ] && [ -r "$img" ] || return 0
+    [ "$img" = "$DST" ] && return 0          # user's wallpaper already IS the synced file
+    # Write via a temp file + atomic rename so a logout mid-copy can't leave the
+    # greeter a torn image. The 2775/setgid dir gives the temp file the wheel group.
+    tmp="$DST.tmp.$$"
+    cp -f "$img" "$tmp" 2>/dev/null || { rm -f "$tmp"; return 0; }
+    chmod 0664 "$tmp" 2>/dev/null
+    mv -f "$tmp" "$DST" 2>/dev/null || rm -f "$tmp"
+}
+
+sync_once
+# React to wallpaper changes for the rest of the session. xfconf-query --monitor
+# blocks on D-Bus change notifications (idle otherwise — no polling).
+xfconf-query -c xfce4-desktop -m 2>/dev/null | while read -r line; do
+    case "$line" in
+        *image*) sync_once ;;
+    esac
+done

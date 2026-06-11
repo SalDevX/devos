@@ -1,0 +1,44 @@
+#!/bin/sh
+# DevOS Touch Bar bind helper — make apple-ibridge own BOTH iBridge HID interfaces.
+#
+# The Apple T1 iBridge (USB 05ac:8600) exposes the Touch Bar over TWO HID interfaces:
+# one carries the "mode" control field, the other the "display" control field.
+# apple_ib_tb only lights the bar when it has BOTH (its probe activates the display
+# only inside `if (mode_info.hdev && disp_info.hdev)`). But hid-sensor-hub matches the
+# 2nd (sensor) interface and steals it from apple-ibridge, so apple_ib_tb only ever
+# gets one interface and the Touch Bar stays DARK.
+#
+# This forces every iBridge HID interface onto apple-ibridge-hid: unbind it from
+# whatever grabbed it (hid-generic / hid-sensor-hub) and bind it to apple-ibridge-hid,
+# which multiplexes it to apple_ib_tb (display) + apple_ib_als (ALS). VERIFIED on a
+# real 2017 15" MacBook Pro (MacBookPro14,3), kernel 6.18.34 — bar shows the function
+# row + responds to taps. No-op on hardware without an iBridge.
+#
+# Run by devos-touchbar-init.service, fired by 60-devos-touchbar.rules when the
+# iBridge enumerates.
+
+modprobe apple-ibridge 2>/dev/null
+modprobe apple-ib-tb   2>/dev/null
+modprobe apple-ib-als  2>/dev/null
+
+drv=/sys/bus/hid/drivers/apple-ibridge-hid
+[ -d "$drv" ] || exit 0   # driver not present -> not an iBridge machine, nothing to do
+
+# The HID interfaces enumerate slightly after the USB device-add that triggered us;
+# wait briefly (up to ~15s) for at least one to appear.
+i=0
+while [ "$i" -lt 15 ]; do
+    set -- /sys/bus/hid/devices/*05AC:8600*
+    [ -e "$1" ] && break
+    i=$((i + 1))
+    sleep 1
+done
+
+for dev in /sys/bus/hid/devices/*05AC:8600*; do
+    [ -e "$dev" ] || continue
+    id=$(basename "$dev")
+    cur=$(basename "$(readlink "$dev/driver" 2>/dev/null)" 2>/dev/null)
+    [ "$cur" = "apple-ibridge-hid" ] && continue
+    [ -n "$cur" ] && echo "$id" > "/sys/bus/hid/drivers/$cur/unbind" 2>/dev/null
+    echo "$id" > "$drv/bind" 2>/dev/null
+done
