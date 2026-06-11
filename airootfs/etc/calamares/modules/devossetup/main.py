@@ -44,10 +44,14 @@ SERVICES = (
 # real Mac the splash was black at boot (only showing at shutdown once i915 was up).
 # The BINARIES line forces the plymouth `script` renderer into the initramfs (the
 # hook bundles the theme files but not its engine). Canonical — mirrored by install.sh.
+# `encrypt` is unconditional: this drop-in OVERRIDES whatever initcpiocfg writes to
+# /etc/mkinitcpio.conf, so without it a LUKS install can never open its root
+# (emergency shell on first boot); the hook is a no-op when the kernel cmdline
+# carries no cryptdevice= (unencrypted installs are unaffected).
 INSTALLED_HOOKS = (
     "MODULES=(i915)\n"
     "HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard "
-    "keymap consolefont block filesystems fsck)\n"
+    "keymap consolefont block encrypt filesystems fsck)\n"
     "BINARIES=(/usr/lib/plymouth/script.so)\n"
 )
 
@@ -73,6 +77,35 @@ def _rm(path):
         os.remove(path)
     except FileNotFoundError:
         pass
+
+
+def _ensure_sddm_wallpaper_perms(root):
+    """Make /var/lib/devos/sddm-wallpaper.jpg wheel-writable + world-readable.
+
+    The file is rsynced from the live system by copyairootfs; here we just assert
+    the ownership/modes so the installed user's session helper
+    (devos-sddm-wallpaper-sync) can mirror the desktop wallpaper into it with no
+    elevation, while the unprivileged sddm greeter can still read it. setgid on
+    the dir makes the helper's atomically-renamed temp files inherit the wheel
+    group. Mirrored by install.sh. Best-effort: never fail the install for this.
+    """
+    d = os.path.join(root, "var/lib/devos")
+    f = os.path.join(d, "sddm-wallpaper.jpg")
+    try:
+        os.makedirs(d, exist_ok=True)
+        shutil.chown(d, group="wheel")
+        os.chmod(d, 0o2775)
+        if os.path.exists(f):
+            shutil.chown(f, group="wheel")
+            os.chmod(f, 0o664)
+        # Per-user login avatars: devos-sddm-avatar-sync publishes ~/.face here
+        # as <user>.face.icon and SDDM's FacesDir points at it. Same scheme.
+        fdir = os.path.join(d, "faces")
+        os.makedirs(fdir, exist_ok=True)
+        shutil.chown(fdir, group="wheel")
+        os.chmod(fdir, 0o2775)
+    except (OSError, LookupError) as e:
+        libcalamares.utils.warning("devossetup: sddm wallpaper perms: " + str(e))
 
 
 def _enable(args):
@@ -116,6 +149,28 @@ def run():
                  "/usr/local/bin/devos-firstboot", 0o755)
     except (subprocess.CalledProcessError, OSError) as e:
         return ("devossetup failed", "copying base files failed: " + str(e))
+
+    # 1b. Backfill skel into the created user's home. devossetup runs AFTER the
+    # users module, and `useradd -m` SILENTLY skips the skel copy when the home
+    # directory already exists (kept/reused /home partition from an earlier
+    # install) — which strands the user without newer skel additions (machud +
+    # its icons: "Failed to execute child process" on every media key).
+    # --ignore-existing only fills gaps, never clobbers the user's own dotfiles
+    # on a kept home. install.sh has the equivalent guarantee for its live
+    # 'user' account (cp -aT skel -> home). Best-effort: never fail the install.
+    username = libcalamares.globalstorage.value("username")
+    if username:
+        home = "/home/" + username
+        if libcalamares.utils.target_env_call(
+                ["rsync", "-a", "--ignore-existing", "/etc/skel/", home + "/"]) != 0:
+            libcalamares.utils.warning("devossetup: skel backfill failed for " + home)
+        elif libcalamares.utils.target_env_call(
+                ["chown", "-R", "{0}:{0}".format(username), home]) != 0:
+            libcalamares.utils.warning("devossetup: chown failed for " + home)
+
+    # 2b. SDDM login wallpaper: ensure the per-machine file is wheel-writable +
+    # world-readable (desktop session mirrors into it; sddm greeter reads it).
+    _ensure_sddm_wallpaper_perms(root)
 
     # 3. enable services in the target.
     for svc in SERVICES:

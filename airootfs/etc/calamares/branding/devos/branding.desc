@@ -11,10 +11,10 @@ strings:
     versionedName:       DevOS (Rolling)
     shortVersionedName:  DevOS
     bootloaderEntryName: DevOS
-    productUrl:          https://github.com/craftworkson/devos
+    productUrl:          https://github.com/SalDevX/devos
     supportUrl:          https://wiki.archlinux.org
-    knownIssuesUrl:      https://github.com/craftworkson/devos/issues
-    releaseNotesUrl:     https://github.com/craftworkson/devos/releases
+    knownIssuesUrl:      https://github.com/SalDevX/devos/issues
+    releaseNotesUrl:     https://github.com/SalDevX/devos/releases
 
 images:
     productLogo:         "logo.png"

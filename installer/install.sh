@@ -91,6 +91,24 @@ ln -sf /usr/bin/sddm-greeter-qt6 "$ROOT/usr/bin/sddm-greeter"
 echo '%wheel ALL=(ALL:ALL) ALL' > "$ROOT/etc/sudoers.d/wheel"
 chmod 0440 "$ROOT/etc/sudoers.d/wheel"
 
+# SDDM login wallpaper: wheel-writable (setgid) + world-readable so the desktop
+# session helper (devos-sddm-wallpaper-sync) can mirror the user's wallpaper into
+# it with no elevation while the sddm greeter can read it. Mirror of
+# devossetup._ensure_sddm_wallpaper_perms (the file itself is rsynced in).
+install -d -m 2775 "$ROOT/var/lib/devos"
+chgrp wheel "$ROOT/var/lib/devos" 2>/dev/null || true
+chmod 2775 "$ROOT/var/lib/devos"
+if [[ -f "$ROOT/var/lib/devos/sddm-wallpaper.jpg" ]]; then
+    chgrp wheel "$ROOT/var/lib/devos/sddm-wallpaper.jpg" 2>/dev/null || true
+    chmod 0664 "$ROOT/var/lib/devos/sddm-wallpaper.jpg"
+fi
+# Per-user login avatars: devos-sddm-avatar-sync publishes ~/.face here as
+# <user>.face.icon; SDDM FacesDir points at it. Mirror of
+# devossetup._ensure_sddm_wallpaper_perms.
+install -d -m 2775 "$ROOT/var/lib/devos/faces"
+chgrp wheel "$ROOT/var/lib/devos/faces" 2>/dev/null || true
+chmod 2775 "$ROOT/var/lib/devos/faces"
+
 # mkinitcpio HOOKS — mirror of devossetup.INSTALLED_HOOKS (drop the archiso
 # hooks, keep Plymouth for the installed system).
 rm -f "$ROOT/etc/mkinitcpio.conf.d/archiso.conf"
@@ -98,7 +116,7 @@ cat > "$ROOT/etc/mkinitcpio.conf.d/devos.conf" << 'MKINITCPIO'
 # Early KMS: force i915 so the Intel framebuffer is up before Plymouth (else the
 # boot splash is black until the GPU driver loads lazily). Mirror of devossetup.
 MODULES=(i915)
-HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard keymap consolefont block filesystems fsck)
+HOOKS=(base udev autodetect microcode modconf kms plymouth keyboard keymap consolefont block encrypt filesystems fsck)
 # Force the plymouth `script` renderer into the initramfs — the plymouth hook
 # bundles the devos theme files but not its engine, so without this the script
 # theme boots black. Mirror of devossetup.INSTALLED_HOOKS.

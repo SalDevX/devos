@@ -1,4 +1,22 @@
 #!/bin/bash
 # Launches Calamares with root privileges, preserving X display environment.
 # Used by both the autostart entry and the desktop shortcut on the live ISO.
+
+# Disable Thunar volume-manager automount for the live session BEFORE the
+# installer starts. Calamares' AutoMountManagementJob only knows KDE/Solid
+# ("Solid not available: Not connected to D-Bus server" on XFCE), so without
+# this udisks/thunar-volman keeps grabbing partitions the installer is busy
+# creating: LUKS "Authentication Required" passphrase popups + polkit mount
+# prompts mid-install, partitions auto-mounted under /run/media/<user> that
+# make KPMCore jobs fail ("device busy" / silent crash during CreatePartition).
+# Live-only: this wrapper is removed from the target by devoscleanup, so the
+# installed system keeps normal automount. Left off for the rest of the live
+# session on purpose (manual mounting in Thunar still works) — re-enabling on
+# installer exit would just re-arm the race for a retry run. Best-effort: -n
+# creates the key if the channel has never been written.
+for key in /automount-drives/enabled /automount-media/enabled \
+           /autobrowse/enabled /autoopen/enabled; do
+    xfconf-query -c thunar-volman -p "$key" -n -t bool -s false 2>/dev/null || true
+done
+
 exec sudo -nE /usr/bin/calamares "$@"
