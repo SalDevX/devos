@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Load the FaceTime HD camera driver on demand and confirm the device appears.
+# Pairs with `cam-off`. The driver is intentionally NOT auto-loaded at boot
+# (it can wedge suspend/resume), so load it only when you need the camera.
+set -e
+
+if lsmod | grep -q '^facetimehd'; then
+    echo "facetimehd already loaded."
+else
+    # bdc_pci grabs the same hardware and stops /dev/video* from being created.
+    sudo modprobe -r bdc_pci 2>/dev/null || true
+    sudo modprobe facetimehd
+    sleep 2
+fi
+
+if [[ -e /dev/video0 ]]; then
+    echo "Camera ready:"
+    v4l2-ctl --list-devices 2>/dev/null | sed 's/^/  /'
+    ls -l /dev/video*
+else
+    echo "No /dev/video0 appeared. Inspect: sudo dmesg | grep -i facetimehd" >&2
+    exit 1
+fi

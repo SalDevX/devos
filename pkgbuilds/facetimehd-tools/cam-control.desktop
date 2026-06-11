@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Camera Controls
+Comment=Adjust FaceTime HD webcam brightness/contrast/saturation/hue live
+Exec=/usr/bin/cam-control
+Icon=camera-web
+Terminal=false
+Categories=AudioVideo;Video;Settings;
+Keywords=camera;webcam;saturation;brightness;facetimehd;

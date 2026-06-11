@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Toggle the FaceTime HD camera driver — for the XFCE panel button.
+# Uses pkexec, so it shows a graphical password prompt (no sudoers needed).
+HELPER=/usr/bin/cam-modprobe   # pkexec requires an absolute program path
+
+if [[ -d /sys/module/facetimehd ]]; then
+    # turning OFF: stop the enforcer (if running), then unload
+    pkill -f cam-tune 2>/dev/null || true
+    pkexec "$HELPER" unload
+else
+    # turning ON: load the driver
+    pkexec "$HELPER" load
+fi

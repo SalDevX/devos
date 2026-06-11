@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Keep the FaceTime HD camera's V4L2 controls pinned.
+#
+# Why: Chromium/Brave (and some other apps) RESET V4L2 controls to default the
+# moment they open the camera, so a one-time `v4l2-ctl -c ...` gets wiped on
+# every Zoom/Meet call. This loop re-applies the desired values within ~1s.
+#
+# Source of truth: ~/.config/cam-control/controls.conf  (name=value per line),
+# written by the `cam-control` GUI. If that file doesn't exist yet, it just
+# pins a default saturation. Self-exits when /dev/video0 disappears, so
+# `cam-off` cleans it up automatically.
+#
+# Usage: cam-tune [default-saturation]   (default 50)
+DEV=/dev/video0
+CONF="${CAM_CONF:-$HOME/.config/cam-control/controls.conf}"
+DEFAULT_SAT="${1:-50}"
+
+while [[ -e "$DEV" ]]; do
+    if [[ -f "$CONF" ]]; then
+        while IFS='=' read -r k v; do
+            [[ -z "$k" || "$k" == \#* ]] && continue
+            v4l2-ctl -d "$DEV" -c "${k// /}=${v// /}" 2>/dev/null || true
+        done < "$CONF"
+    else
+        v4l2-ctl -d "$DEV" -c "saturation=$DEFAULT_SAT" 2>/dev/null || true
+    fi
+    sleep 1
+done

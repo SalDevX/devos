@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Unload the FaceTime HD camera driver, e.g. before suspend or to free the device.
+# If anything is holding /dev/video0, force-kill it (SIGKILL) and retry — "nuke it".
+# Pairs with `cam-on`.
+
+# stop the saturation enforcer (it would also self-exit once the device is gone)
+pkill -f cam-tune 2>/dev/null || true
+
+if ! lsmod | grep -q '^facetimehd'; then
+    echo "facetimehd not loaded."
+    exit 0
+fi
+
+unload() { sudo modprobe -r facetimehd 2>/dev/null; }
+
+# fast path: nothing holding it
+if unload; then
+    echo "Camera driver unloaded."
+    exit 0
+fi
+
+# busy → kill every process touching the camera, then retry (a few times, since
+# something like wireplumber may briefly respawn and re-open the device)
+for attempt in 1 2 3; do
+    holders=$(sudo fuser /dev/video0 2>/dev/null | tr -s ' ')
+    if [[ -n "${holders// /}" ]]; then
+        echo "Killing processes holding the camera:${holders}"
+        sudo fuser -k -KILL /dev/video0 2>/dev/null
+        sleep 1
+    fi
+    if unload; then
+        echo "Camera driver unloaded (after killing holders)."
+        exit 0
+    fi
+done
+
+echo "Still couldn't unload after nuking holders. Remaining:" >&2
+sudo fuser -v /dev/video0 2>/dev/null >&2
+exit 1

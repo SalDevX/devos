@@ -50,7 +50,13 @@ ts() { date '+%Y-%m-%d %H:%M:%S'; }
 # from the filename, so pacman semantics are preserved.
 BUILDDIR_BASE="/var/tmp/devos-makepkg"
 PKGDEST_BASE="/var/tmp/devos-makepkg-pkgs"
-mkdir -p "$BUILDDIR_BASE" "$PKGDEST_BASE"
+# SRCDEST must be SEPARATE from BUILDDIR: makepkg caches a 'name::git+...' source
+# at $SRCDEST/<name>, and its per-package build dir is $BUILDDIR/<pkgbase>. When a
+# PKGBUILD names its git checkout after the package (e.g. facetimehd-dkms uses
+# source=("$pkgname"::git+...)), those two paths collide if SRCDEST==BUILDDIR →
+# makepkg aborts with "... is not a clone of <url>". Keep them apart.
+SRCDEST_BASE="/var/tmp/devos-makepkg-src"
+mkdir -p "$BUILDDIR_BASE" "$PKGDEST_BASE" "$SRCDEST_BASE"
 
 ok=0; skip=0; failc=0
 while IFS= read -r line; do
@@ -99,7 +105,7 @@ while IFS= read -r line; do
   mkdir -p "$PKGDEST_PKG"
   rm -f "$PKGDEST_PKG"/*.pkg.tar.zst 2>/dev/null || true
   if ( cd "$srcpath" && \
-       BUILDDIR="$BUILDDIR_BASE" PKGDEST="$PKGDEST_PKG" SRCDEST="$BUILDDIR_BASE" \
+       BUILDDIR="$BUILDDIR_BASE" PKGDEST="$PKGDEST_PKG" SRCDEST="$SRCDEST_BASE" \
        makepkg -s --noconfirm --needed "${MKPKG_EXTRA[@]}" ) >"$REPO_DIR/build-$name.log" 2>&1; then
     # Copy artifacts to exFAT repo with ":" → "_" in filename so exFAT
     # accepts them. repo-add will rebuild the db from the renamed files.

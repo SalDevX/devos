@@ -1,0 +1,63 @@
+# DevOS in-tree package: FaceTime HD webcam helper suite (MacBook).
+#
+# Bundles everything the reverse-engineered facetimehd camera needs to be usable
+# out of the box on a DevOS MacBook install:
+#   - cam-control : a compiled gtkmm-3.0 live V4L2 control panel (the only piece
+#                   that needs building; the rest are shell scripts)
+#   - cam-on/off  : load/unload the driver on demand
+#   - cam-tune    : enforcer that re-pins V4L2 controls against Brave/Chromium's
+#                   reset-on-open (reads ~/.config/cam-control/controls.conf)
+#   - cam-toggle/cam-modprobe/cam-genmon : XFCE panel button + status dot; the
+#                   privileged half (cam-modprobe) runs via pkexec/polkit, so the
+#                   user authenticates per toggle — NO passwordless sudoers rule,
+#                   no setuid binary.
+#   - webcam      : PipeWire/non-GL capture helper (view / photo)
+#
+# The driver is deliberately NOT auto-loaded at boot (keeping facetimehd loaded
+# across suspend/resume can wedge the hardware), so nothing here installs a
+# modules-load.d entry — the camera is loaded on demand via cam-on / the panel dot.
+#
+# Built by devos/tools/build-aur-repo.sh via the `local:pkgbuilds/facetimehd-tools`
+# entry in aur-build-list.txt. Runtime deps (facetimehd-dkms/-firmware + guvcview +
+# gstreamer + v4l-utils + polkit) are pulled by pacstrap from depends() below.
+pkgname=facetimehd-tools
+pkgver=1.0
+pkgrel=1
+pkgdesc="FaceTime HD webcam helper suite for MacBook (cam-control GUI + on/off/tune/toggle scripts)"
+arch=('x86_64')
+url="https://github.com/patjak/facetimehd"
+license=('GPL2')
+# facetimehd-dkms + facetimehd-firmware are the runtime driver/firmware, but they
+# are NOT listed in depends: they are AUR-built (their own aur-build-list.txt
+# entries) and force-installed into the ISO alongside this package, and
+# build-aur-repo.sh cannot install one local package as a build-time dep of
+# another (it repo-adds only after the whole build loop, and [devos-local] is not
+# in the build host's pacman.conf) — listing them aborts the build with
+# "target not found". Declared as optdepends for documentation; the ISO ships all
+# three regardless. The official-repo runtime deps below DO resolve, so pacstrap
+# pulls them into the image.
+depends=('guvcview' 'gst-plugin-pipewire' 'gst-plugins-good' 'gst-plugins-base'
+         'v4l-utils' 'polkit' 'polkit-gnome')
+optdepends=('facetimehd-dkms: FaceTime HD camera driver (required at runtime)'
+            'facetimehd-firmware: extracted camera firmware (required at runtime)')
+makedepends=('gtkmm3' 'pkgconf' 'gcc')
+source=('cam-control.cpp'
+        'cam-on' 'cam-off' 'cam-tune' 'cam-toggle' 'cam-modprobe' 'cam-genmon' 'webcam'
+        'cam-control.desktop' 'cam-toggle.desktop')
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+build() {
+    cd "$srcdir"
+    g++ cam-control.cpp -o cam-control \
+        $(pkg-config --cflags --libs gtkmm-3.0) -std=c++17
+}
+
+package() {
+    cd "$srcdir"
+    install -Dm755 cam-control "$pkgdir/usr/bin/cam-control"
+    for s in cam-on cam-off cam-tune cam-toggle cam-modprobe cam-genmon webcam; do
+        install -Dm755 "$s" "$pkgdir/usr/bin/$s"
+    done
+    install -Dm644 cam-control.desktop "$pkgdir/usr/share/applications/cam-control.desktop"
+    install -Dm644 cam-toggle.desktop  "$pkgdir/usr/share/applications/cam-toggle.desktop"
+}

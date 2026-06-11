@@ -26,6 +26,9 @@ zsh
 zsh-autosuggestions
 zsh-syntax-highlighting
 zsh-theme-powerlevel10k
+# sourced by skel .zshrc (history-substring-search on the arrow keys) — without
+# the package every interactive shell errors at startup
+zsh-history-substring-search
 bash-completion
 alacritty
 tmux
@@ -153,6 +156,10 @@ xfce4-screensaver
 xfce4-power-manager
 xfce4-battery-plugin
 xfce4-calculator-plugin
+# speedcrunch: pinned launcher in the default panel (skel launcher-18 ->
+# /usr/share/applications/speedcrunch.desktop) — without the package the panel
+# ships a dead button
+speedcrunch
 xfce4-dict
 xfce4-cpufreq-plugin
 xfce4-cpugraph-plugin
@@ -258,6 +265,24 @@ feh
 yt-dlp
 liblqr
 
+# --- FaceTime HD webcam (MacBook) --------------------------------------------
+# Runtime deps for the facetimehd-tools package (cam-control GUI + cam-* helpers,
+# built from local:pkgbuilds/facetimehd-tools). Driver/firmware come from the AUR
+# build list; these are the repo-side apps the helpers shell out to:
+#   guvcview            - V4L2 camera app that works on the Haswell GPU (no GL sink)
+#   gst-plugin-pipewire - GStreamer<->PipeWire bridge (webcam view/photo helper)
+#   gst-plugins-good    - xvimagesink / jpegenc / videoconvert for the helper
+#   v4l-utils           - v4l2-ctl (control enumeration + the cam-tune enforcer)
+#   polkit-gnome        - graphical polkit agent for the pkexec camera toggle
+# NOTE: NO inline `# comments` on package lines — mkarchiso's `sed 's/#.*//'`
+# leaves the trailing whitespace, producing "guvcview   " which pacman can't
+# resolve ("target not found"). Keep one bare package per line.
+guvcview
+gst-plugin-pipewire
+gst-plugins-good
+v4l-utils
+polkit-gnome
+
 # --- Office & Documents ------------------------------------------------------
 libreoffice-still
 obsidian
@@ -309,3 +334,61 @@ lib32-libdbusmenu-glib
 lib32-libdbusmenu-gtk3
 lib32-mesa
 libxcrypt-compat
+
+# --- AUR packages (auto-appended by build-iso.sh from /run/media/craftworkson/space2/devos-local/devos-aur-built.txt) ---
+cogl
+clutter
+clutter-gtk
+calamares
+brave-bin
+xfdashboard
+vala-panel-appmenu
+mdcat
+tiv
+ccze
+cfonts
+neofetch
+arc-gtk-theme
+arc-icon-theme
+gruvbox-plus-icon-theme-git
+whitesur-gtk-theme
+mcos-mjv-xfce-edition
+moka-icon-theme-git
+prot16-xfce4-terminal
+xfce4-artwork
+xfwm4-themes
+ttf-ms-fonts
+bdf-unifont
+menulibre
+mbpfan
+ch34x-dkms-git
+hfsprogs
+cpuid
+i7z
+usbmon
+macbook12-spi-driver-dkms
+apple-ib-drv-f13-dkms
+snd-hda-macbookpro-dkms-git
+facetimehd-firmware
+facetimehd-dkms
+facetimehd-tools
+visual-studio-code-bin
+yay
+ookla-speedtest-bin
+powerstat
+cdbus-git
+gtk2
+gtk-engine-murrine
+gtkmm
+libglade
+libdbusmenu-gtk2
+libwnck
+libchamplain
+icu66-bin
+libffi7
+openssl-1.1
+libjpeg6-turbo
+imgui
+magic_enum
+reproc
+libuvc

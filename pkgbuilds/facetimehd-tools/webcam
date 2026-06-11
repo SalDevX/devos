@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Simple FaceTime HD webcam tool for this MacBookPro11,1.
+#
+# Goes through PipeWire and renders with a plain (non-GL) sink. This avoids:
+#   * facetimehd's limited-buffer quirk that breaks direct-V4L2 apps
+#     (guvcview/ffmpeg -> "No buffer space available"), and
+#   * kamoso's qml6glsink GL path that fails on the old Haswell Iris 5100.
+#
+# Usage:
+#   webcam view            live preview window (close with Ctrl-C or q)
+#   webcam photo [file]    save a still (defaults to ~/Pictures/webcam-<ts>.jpg)
+set -euo pipefail
+
+# make sure the driver is loaded (this device has no autodetect/GL-safe sink,
+# so we use xvimagesink explicitly - the Haswell GPU's GL sinks are broken)
+if [[ ! -d /sys/module/facetimehd ]]; then
+    echo "Camera driver not loaded - running cam-on..."
+    cam-on >/dev/null
+fi
+
+cmd="${1:-view}"
+case "$cmd" in
+    view)
+        exec gst-launch-1.0 pipewiresrc ! videoconvert ! xvimagesink
+        ;;
+    photo)
+        ts=$(date +%Y%m%d-%H%M%S)
+        out="${2:-$HOME/Pictures/webcam-$ts.jpg}"
+        tmp="/tmp/webcam-$ts"
+        # grab 30 frames so auto-exposure settles, then keep the last one
+        gst-launch-1.0 -q pipewiresrc num-buffers=30 ! videoconvert ! jpegenc \
+            ! multifilesink location="${tmp}-%03d.jpg"
+        last=$(ls "${tmp}"-*.jpg | tail -1)
+        mv "$last" "$out"
+        rm -f "${tmp}"-*.jpg
+        echo "saved $out"
+        ;;
+    *)
+        echo "usage: webcam [view|photo [file]]" >&2
+        exit 1
+        ;;
+esac

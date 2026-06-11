@@ -16,8 +16,15 @@ cogl                            # GPU acceleration lib — clutter runtime dep
 clutter                         # 1.x toolkit for OpenGL UI (xfdashboard runtime dep)
 clutter-gtk                     # GTK embedding for clutter (libchamplain runtime dep)
 
-# --- Installer deps (build first — calamares depends on webkit2gtk) ----------
-webkit2gtk                      # WebKit2 GTK 4.0 API — older version; calamares dep
+# --- Installer ---------------------------------------------------------------
+# Do NOT re-add webkit2gtk here. The Qt6 Calamares fork depends only on the
+# KF6/Qt6 stack (kcoreaddons, kpmcore, qt6-declarative, … — see its PKGBUILD),
+# NOT webkit2gtk. The old `webkit2gtk` (GTK 4.0 / libsoup2 API) was removed
+# 2026-06-03: Arch dropped it from the repos, its libsoup2 dep is now
+# unresolvable, and nothing in the ISO consumes it (komorebi — the only
+# webkit2gtk user — lives on the source host, not in DevOS). build-iso.sh
+# auto-appends every built AUR pkg to packages.x86_64, so an orphan build here
+# is force-installed into the ISO and breaks the whole mkarchiso run.
 local:pkgbuilds/calamares       # GUI installer — DevOS fork of AUR calamares; adds the in-tree devosnetwork view module (see devos/pkgbuilds/calamares/PKGBUILD)
 
 # --- Browser -----------------------------------------------------------------
@@ -27,6 +34,34 @@ brave-bin                       # Brave browser — prebuilt binary release
 xfdashboard                     # XFCE Exposé-style overview / app switcher
 libinput-gestures               # Touchpad multi-touch gesture daemon (MacBook)
 zsh-theme-powerlevel10k         # Powerlevel10k — fast, feature-rich zsh prompt
+
+# --- Global menu (macOS-style top-bar app menu) ------------------------------
+# The top panel's `appmenu` plugin (plugin-14, libappmenu.so) needs this set, or
+# xfce4-panel fails to load it and the WHOLE top bar disappears (Plugin loading
+# failure dialog). Order matters: the translator is a depend of the xfce plugin.
+# Architecture (com.canonical.AppMenu.Registrar DBus hub at the centre):
+#   - vala-panel-appmenu-registrar = the registrar service (the hub everything
+#     registers into). REQUIRED for menus to actually appear — without it the
+#     panel widget shows nothing.
+#   - appmenu-gtk-module (official, in packages.x86_64) = GTK apps export here.
+#   - Qt5/Qt6 apps export here automatically (Qt has BUILT-IN QDBusMenuBar since
+#     5.7 — there is NO appmenu-qt5/qt6 on the AUR; Qt absorbed it). The registrar
+#     being on the bus is all Qt needs.
+#   - vala-panel-appmenu-xfce = the panel plugin that DISPLAYS the focused
+#     window's menu from the registrar.
+# All these pieces are SPLIT packages of ONE pkgbase `vala-panel-appmenu` — you
+# CANNOT build them by split name (the per-split AUR git repos are empty → "PKGBUILD
+# does not exist"). So we build the pkgbase via a local: fork that disables the
+# mate/budgie/vala variants (they'd need mate-panel/budgie-desktop/vala-panel(AUR)).
+# One build emits: vala-panel-appmenu (meta) + -locale + -registrar +
+# appmenu-glib-translator + -xfce. See devos/pkgbuilds/vala-panel-appmenu/PKGBUILD.
+#   - vala-panel-appmenu-registrar = com.canonical.AppMenu.Registrar DBus hub
+#     (GTK + Qt5/Qt6 apps register menus here; Qt has built-in QDBusMenuBar — no
+#     appmenu-qt5/qt6 exists, Qt absorbed it)
+#   - appmenu-glib-translator      = DBusMenu->GMenu translator
+#   - vala-panel-appmenu-xfce      = the 'appmenu' panel plugin (libappmenu.so) that
+#     DISPLAYS the focused window's menu — this is what plugin-14 needs to exist
+local:pkgbuilds/vala-panel-appmenu   # macOS-style global menu stack (xfce plugin + registrar + translator); fork disables mate/budgie/vala variants
 
 # --- CLI / Terminal Tools ----------------------------------------------------
 mdcat                           # Render Markdown with images in the terminal
@@ -61,6 +96,49 @@ hfsprogs                        # HFS+ filesystem tools (read/write macOS drives
 cpuid                           # CPU identification and feature flags tool
 i7z                             # Intel i7/i5/i3 real-time CPU frequency reporter
 usbmon                          # USB bus traffic monitoring tool
+
+# --- MacBook 2016/2017 (T1) — SPI keyboard/trackpad + Touch Bar (DKMS) --------
+# Shipped always; the modules only BIND where the hardware exists, so they no-op
+# on Haswell/other Macs. linux-lts ships NO applespi, so the SPI keyboard+trackpad
+# need the DKMS driver; the Touch Bar needs the patched apple-ib-drv-f13 fork below.
+# ⚠ Confirm these exact AUR names at build time (build-aur-repo.sh fails loudly on a
+# typo) and that your linux-lts still lacks applespi. tiny-dfr (the pretty function
+# -row renderer) is intentionally NOT here — it lives in a t2 community repo, not the
+# AUR; the basic Touch Bar (Esc/Fn/media) works via apple-ib-tb without it. Vendor it
+# as local:pkgbuilds/tiny-dfr later if you want the macOS-style rendering.
+local:pkgbuilds/macbook12-spi-driver-dkms   # applespi: SPI keyboard + trackpad (2015-2017 MBP). DevOS fork — upstream fails on kernel >=6.12 (asm/unaligned.h + no_llseek); also trimmed to applespi only (apple-ib-* dupes apple-ib-drv).
+# Touch Bar / ALS — DevOS fork of F13-Kr1pt0n/macbook-pro-touchbar-driver. The old AUR
+# apple-ib-drv-dkms-git PANICS kernel >=6.18 (__hid_bpf_ops_destroy_device → kills PID1);
+# this fork is keyed to the T1 iBridge (05ac:8600) and carries 2 DevOS patches (tb_touch
+# hoist + skip the deadlocking USB config-switch). VERIFIED fully working on MacBookPro14,3,
+# kernel 6.18.34 (bar shows the function row + taps). The system side (devos-touchbar-init.
+# service + devos-touchbar-bind) forces both iBridge HID interfaces onto apple-ibridge so
+# hid-sensor-hub can't steal the 2nd one (which keeps the display dark).
+local:pkgbuilds/apple-ib-drv-f13-dkms
+
+# --- MacBook 2016/2017 audio (Cirrus CS8409 internal speakers) ---------------
+# linux-lts DETECTS the CS8409 codec but does NOT initialise Apple's external
+# speaker amplifiers (MAX98706/SSM3515 wired over I2C) -> speakers silent (the
+# codec/headphone DAC works, but the speaker amp never wakes). davidjo's patched
+# cs8409 DKMS driver adds the Apple amp-init; explicitly supports MacBookPro14,3
+# (codec subsystem 0x106b3900). DKMS installs the patched module to
+# /lib/modules/<kver>/updates/ which OVERRIDES the in-kernel snd_hda_codec_cs8409
+# (no blacklist needed); it only binds CS8409 hardware so it no-ops elsewhere.
+# ⚠ Compiles at ISO-build via DKMS against linux-lts-headers — if it fails on a
+# kernel bump, fork it under pkgbuilds/ (same as macbook12-spi-driver).
+local:pkgbuilds/snd-hda-macbookpro-dkms-git   # CS8409 speaker amp init (2016/2017 MBP) — davidjo driver. DevOS fork: upstream dkms.conf BUILT_MODULE_LOCATION is wrong for kernel >=6.17 (cs8409 moved to codecs/cirrus/) → module builds but DKMS can't install it → speakers stay silent. Fork repoints the path. VERIFIED on MacBookPro14,3.
+
+# --- MacBook FaceTime HD webcam ----------------------------------------------
+# The built-in camera is a PCIe device (Broadcom 14e4:1570) with NO in-kernel
+# driver. It needs patjak's reverse-engineered facetimehd driver (DKMS) + firmware
+# extracted from a macOS image (the firmware pkg downloads + extracts it at build
+# time — needs network). Driver is loaded ON DEMAND only (auto-load wedges
+# suspend), via the cam-* helpers in facetimehd-tools. Build order: firmware +
+# dkms first, then the tools package (which depends on both). VERIFIED on
+# MacBookPro11,1 (YUYV 1280x720 @ 30fps, /dev/video0).
+facetimehd-firmware             # firmware extracted from a macOS image (network at build time)
+facetimehd-dkms                 # patjak reverse-engineered PCIe FaceTime HD driver (DKMS vs linux-lts-headers)
+local:pkgbuilds/facetimehd-tools   # cam-control GUI (gtkmm) + cam-on/off/tune/toggle/genmon/webcam scripts + desktop entries; pulls guvcview/gstreamer/v4l-utils/polkit as deps
 
 # --- Developer Tools ---------------------------------------------------------
 visual-studio-code-bin          # VS Code — prebuilt binary release

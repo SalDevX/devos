@@ -1,0 +1,76 @@
+# DevOS fork of F13-Kr1pt0n/macbook-pro-touchbar-driver — the Apple T1 "iBridge"
+# Touch Bar + ALS driver (apple-ibridge / apple-ib-tb / apple-ib-als).
+#
+# REPLACES the old `apple-ib-drv-dkms-git` (t2linux), which is too old for kernel
+# >=6.18: it runtime-PANICS in __hid_bpf_ops_destroy_device on a 2017 MacBook Pro
+# (MacBookPro14,3) → kills PID 1. The F13 fork is the modern macbook12-spi-driver
+# lineage, keyed to the T1 iBridge (USB 05ac:8600), and it loads cleanly on 6.18 —
+# but it needs TWO DevOS patches to actually work (both VERIFIED on MacBookPro14,3,
+# kernel 6.18.34: Touch Bar shows the function row + responds to taps/Fn):
+#
+#   1. COMPILE FIX (apple-ib-tb.c): the embedded field `struct tb_touch touch;` in
+#      `struct appletb_device` is used before `struct tb_touch` is defined → "field
+#      'touch' has incomplete type" on every kernel >=6.15. Hoist the definition
+#      above the struct that embeds it.
+#
+#   2. RUNTIME FIX (apple-ibridge.c): F13's "TB coordinator" calls
+#      usb_set_configuration() from inside the HID probe to switch the iBridge USB
+#      config. That DEADLOCKS (it tears down the interface being probed → permanent
+#      D-state hang in appleib_hid_probe), and even deferred it leaves the iBridge
+#      UNCONFIGURED. The iBridge already boots in cfg 1 ("Default iBridge Interfaces"),
+#      which exposes the Touch Bar HID, so we DON'T switch config at all — apple_ib_tb
+#      drives the bar via HID reports. Patch makes the probe skip the switch.
+#
+# SYSTEM SIDE (not here): hid-sensor-hub steals the iBridge's 2nd HID interface, which
+# keeps the Touch Bar DISPLAY dark (apple_ib_tb needs BOTH interfaces). DevOS forces
+# both onto apple-ibridge-hid via devos-touchbar-init.service / devos-touchbar-bind.
+#
+# prepare() applies both patches with python3 (the asserts fail the build loudly if
+# upstream moves the anchors — re-verify on a kernel bump). Built via the
+# `local:pkgbuilds/apple-ib-drv-f13-dkms` entry in aur-build-list.txt; DKMS compiles
+# it at ISO-build against linux-lts-headers.
+
+_pkgbase=appleibridge
+pkgname=apple-ib-drv-f13-dkms
+pkgver=0.1
+pkgrel=1
+pkgdesc="Apple T1 iBridge Touch Bar + ALS driver (DevOS fork of F13-Kr1pt0n; patched for kernel >=6.18: tb_touch hoist + no USB config-switch)"
+arch=('x86_64')
+url="https://github.com/F13-Kr1pt0n/macbook-pro-touchbar-driver"
+license=('GPL2')
+depends=('dkms')
+makedepends=('git' 'python')
+provides=('apple-ib-drv-dkms-git' 'apple-ib-drv')
+conflicts=('apple-ib-drv-dkms-git' 'apple-ib-drv-dkms')
+source=("git+https://github.com/F13-Kr1pt0n/macbook-pro-touchbar-driver.git#branch=touchbar-driver-hid-driver")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "$srcdir/macbook-pro-touchbar-driver"
+    python3 - <<'PY'
+import re
+# Patch 1 (compile): hoist `struct tb_touch` above `struct appletb_device`.
+p1 = 'apple-ib-tb.c'; s = open(p1).read()
+m = re.search(r'\nstruct tb_touch\s*\{.*?\};\n', s, re.S)
+assert m, "patch1: struct tb_touch definition not found"
+d = m.group(0).strip('\n'); s = s[:m.start()] + '\n' + s[m.end():]
+i = s.find('\nstruct appletb_device {')
+assert i != -1, "patch1: struct appletb_device not found"
+s = s[:i] + '\n/* DevOS port: hoisted so the embedded `touch` field is a complete type on kernel >=6.15 */\n' + d + '\n' + s[i:]
+open(p1, 'w').write(s)
+# Patch 2 (runtime): skip the USB config switch in the HID probe (it deadlocks and
+# unconfigures the iBridge). The device already boots in cfg 1 with the Touch Bar HID.
+p2 = 'apple-ibridge.c'; s = open(p2).read()
+old = '\trc = apple_ib_set_tb_mode(udev, apple_tb_mode);'
+assert s.count(old) == 1, "patch2: probe call anchor count=%d" % s.count(old)
+s = s.replace(old, '\trc = 0; /* DevOS: skip USB config switch (iBridge boots in cfg1 with the Touch Bar HID); apple_ib_tb drives the bar via HID reports */', 1)
+open(p2, 'w').write(s)
+print("DevOS: applied tb_touch-hoist + config-switch-skip patches")
+PY
+}
+
+package() {
+    install -dm755 "${pkgdir}/usr/src/${_pkgbase}-${pkgver}"
+    cp -r macbook-pro-touchbar-driver/. "${pkgdir}/usr/src/${_pkgbase}-${pkgver}/"
+    rm -rf "${pkgdir}/usr/src/${_pkgbase}-${pkgver}/.git"
+}

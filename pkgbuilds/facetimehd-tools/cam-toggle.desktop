@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Camera Toggle
+Comment=Turn the FaceTime HD camera on or off (asks for password)
+Exec=/usr/bin/cam-toggle
+Icon=camera-web
+Terminal=false
+Categories=AudioVideo;Video;Settings;
+Keywords=camera;webcam;toggle;on;off;facetimehd;

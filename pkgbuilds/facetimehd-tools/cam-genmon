@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# XFCE Generic Monitor (genmon) script: shows camera state and toggles on click.
+# Point a "Generic Monitor" panel plugin at this with a ~2s update period.
+if [[ -d /sys/module/facetimehd ]]; then
+    echo "<txt><span foreground='#8ec07c'>●</span></txt>"
+    echo "<tool>FaceTime HD camera: ON</tool>"
+else
+    echo "<txt><span foreground='#7c7c7c'>○</span></txt>"
+    echo "<tool>FaceTime HD camera: OFF</tool>"
+fi
+echo "<click>/usr/bin/cam-toggle</click>"
