@@ -1,9 +1,12 @@
-// DevOS Plymouth Theme v2
-// Dark background · "DevOS" text · macOS-style pill progress bar
-// Title: devos-logo.png — pre-rendered "DevOS" in Geist Light, so the splash has
+// DevOS Plymouth Theme v3
+// Dark background · "devOS" wordmark · macOS-style rounded pill progress bar.
+// Title: devos-logo.png — pre-rendered "devOS" in Geist Light, so the splash has
 //        NO early-boot font dependency (Image.Text + fc-match repeatedly rendered
-//        nothing in the initramfs → black screen). Regenerate from Geist-Light.ttf.
-// Bar:  4-piece pill (cap + stretch + cap) — bar_track_cap/mid + bar_fill_cap/mid PNGs
+//        nothing in the initramfs → black screen). Regenerate the logo + bar PNGs
+//        with tools/gen-plymouth-assets.py (then gen-boot-splash.py for the menus).
+// Bar:  3-slice rounded pill — a LEFT semicircle cap + a stretched flat mid + a
+//        RIGHT semicircle cap, abutting with NO overlap, so the ends are cleanly
+//        rounded with no pinch at the joins and no alpha stacking on the gray track.
 
 Window.SetBackgroundTopColor(0.067, 0.067, 0.067);
 Window.SetBackgroundBottomColor(0.067, 0.067, 0.067);
@@ -27,55 +30,128 @@ if (mode != "shutdown" && mode != "reboot")
 screen_w = Window.GetWidth();
 screen_h = Window.GetHeight();
 
-// --- Title ---
+// --- Title: pre-rendered "devOS" wordmark (drawn at its native size) ---
 title_img    = Image("devos-logo.png");
 title_sprite = Sprite(title_img);
 title_sprite.SetPosition(
     Round(screen_w / 2 - title_img.GetWidth()  / 2),
-    Round(screen_h * 0.44 - title_img.GetHeight() / 2),
+    Round(screen_h * 0.40 - title_img.GetHeight() / 2),
     10
 );
 
-// --- Progress bar: 30% screen width, 6 px tall, pill-shaped ends ---
+// --- Progress bar: macOS-style rounded pill ------------------------------
+// Each cap is a semicircle of width rad (= bar_h/2); the mid is a flat strip
+// stretched between them. Pieces ABUT (no overlap), so the gray track keeps a
+// uniform alpha and the ends are cleanly rounded.
 bar_w = Round(screen_w * 0.30);
-bar_h = 6;
-cap_w = bar_h;    // end-cap image is bar_h × bar_h (circle)
+bar_h = 8;                 // MUST match BAR_H in tools/gen-plymouth-assets.py
+rad   = bar_h / 2;         // = 4 — corner radius AND cap width
 bar_x = Round((screen_w - bar_w) / 2);
-bar_y = Round(screen_h * 0.62 - bar_h / 2);
+bar_y = Round(screen_h * 0.64 - bar_h / 2);
 
-// Track (rgba 255,255,255,0.18)
-trk_cap = Image("bar_track_cap.png");
-trk_mid = Image("bar_track_mid.png");
-trk_l = Sprite(trk_cap);                              trk_l.SetPosition(bar_x,                bar_y, 2);
-trk_c = Sprite(trk_mid.Scale(bar_w - cap_w * 2, bar_h)); trk_c.SetPosition(bar_x + cap_w,    bar_y, 2);
-trk_r = Sprite(trk_cap);                              trk_r.SetPosition(bar_x + bar_w - cap_w, bar_y, 2);
+// Track (gray) — left cap + flat mid + right cap, all at z2 (they abut)
+trk_l_img = Image("bar_track_cap_l.png");
+trk_r_img = Image("bar_track_cap_r.png");
+trk_mid   = Image("bar_track_mid.png");
+trk_l = Sprite(trk_l_img);                            trk_l.SetPosition(bar_x,               bar_y, 2);
+trk_c = Sprite(trk_mid.Scale(bar_w - bar_h, bar_h)); trk_c.SetPosition(bar_x + rad,         bar_y, 2);
+trk_r = Sprite(trk_r_img);                            trk_r.SetPosition(bar_x + bar_w - rad, bar_y, 2);
 
-// Fill (rgba 255,255,255,0.85) — hidden until enough progress to show the pill
-fill_cap = Image("bar_fill_cap.png");
-fill_mid = Image("bar_fill_mid.png");
-fill_l = Sprite(fill_cap); fill_l.SetOpacity(0); fill_l.SetPosition(bar_x, bar_y, 3);
-fill_c = Sprite(fill_mid.Scale(1, bar_h));        fill_c.SetPosition(bar_x + cap_w, bar_y, 3);
-fill_r = Sprite(fill_cap); fill_r.SetOpacity(0);
+// Fill (near-white) — same shape, above the track (z3), grows L→R.
+// Hidden until there is room for the rounded nub (fill_w >= bar_h).
+fill_l_img = Image("bar_fill_cap_l.png");
+fill_r_img = Image("bar_fill_cap_r.png");
+fill_mid   = Image("bar_fill_mid.png");
+fill_l = Sprite(fill_l_img); fill_l.SetOpacity(0); fill_l.SetPosition(bar_x, bar_y, 3);
+fill_r = Sprite(fill_r_img); fill_r.SetOpacity(0); fill_r.SetPosition(bar_x, bar_y, 3);
+fill_c = Sprite(fill_mid.Scale(1, bar_h)); fill_c.SetOpacity(0); fill_c.SetPosition(bar_x + rad, bar_y, 3);
 
 fun ProgressCallback(duration, progress) {
+    if (in_password == 1) { return; }   // don't repaint over the passphrase dialog
     fill_w = Round(bar_w * progress);
-    if (fill_w < cap_w * 2) {
+    if (fill_w < bar_h) {
         fill_l.SetOpacity(0);
-        fill_c.SetImage(fill_mid.Scale(1, bar_h));
+        fill_c.SetOpacity(0);
         fill_r.SetOpacity(0);
     } else {
+        mid_w = fill_w - bar_h;
+        if (mid_w < 1) { mid_w = 1; }
         fill_l.SetOpacity(1.0);
-        fill_c.SetImage(fill_mid.Scale(fill_w - cap_w * 2, bar_h));
+        fill_l.SetPosition(bar_x, bar_y, 3);
+        fill_c.SetImage(fill_mid.Scale(mid_w, bar_h));
+        fill_c.SetPosition(bar_x + rad, bar_y, 3);
+        fill_c.SetOpacity(1.0);
         fill_r.SetOpacity(1.0);
-        fill_r.SetX(bar_x + fill_w - cap_w);
-        fill_r.SetY(bar_y);
-        fill_r.SetZ(3);
+        fill_r.SetPosition(bar_x + fill_w - rad, bar_y, 3);
     }
 }
 
 fun RefreshCallback() {}
 
+// --- LUKS passphrase dialog -----------------------------------------------
+// `plymouth ask-for-password` (the initramfs `encrypt` hook for root, and
+// systemd-cryptsetup for /home) routes through SetDisplayPasswordFunction.
+// Without these callbacks the script engine renders NOTHING for the prompt —
+// the splash sits on the logo while the boot silently waits for a passphrase
+// (the "hangs at the splash" symptom on encrypted installs; typing the
+// passphrase blind + Enter worked). Prompt text + bullets are pre-rendered
+// PNGs (gen-plymouth-assets.py) because Image.Text is dead in the initramfs.
+pw_prompt_img = Image("pw_prompt.png");
+pw_prompt = Sprite(pw_prompt_img);
+pw_prompt.SetOpacity(0);
+pw_prompt.SetPosition(
+    Round(screen_w / 2 - pw_prompt_img.GetWidth()  / 2),
+    Round(screen_h * 0.58 - pw_prompt_img.GetHeight() / 2),
+    10
+);
+
+pw_bullet_img = Image("pw_bullet.png");
+pw_d = pw_bullet_img.GetWidth();
+pw_gap = 6;
+PW_MAX = 24;   // bullets shown at most; longer passphrases just cap visually
+for (i = 0; i < PW_MAX; i++) {
+    pw_bullet[i] = Sprite(pw_bullet_img);
+    pw_bullet[i].SetOpacity(0);
+}
+
+in_password = 0;   // ProgressCallback must not repaint the fill over the dialog
+
+fun HideBar() {
+    trk_l.SetOpacity(0);  trk_c.SetOpacity(0);  trk_r.SetOpacity(0);
+    fill_l.SetOpacity(0); fill_c.SetOpacity(0); fill_r.SetOpacity(0);
+}
+
+// NB: writes inside `fun` are LOCAL unless prefixed `global.` — assigning
+// plain `in_password` here would shadow, not set, the flag above.
+fun DisplayPasswordCallback(prompt, bullets) {
+    global.in_password = 1;
+    HideBar();
+    pw_prompt.SetOpacity(1);
+    if (bullets > PW_MAX) { bullets = PW_MAX; }
+    row_w = bullets * pw_d + (bullets - 1) * pw_gap;
+    start_x = Round(screen_w / 2 - row_w / 2);
+    y = Round(screen_h * 0.64 - pw_d / 2);   // bullets sit where the bar was
+    for (i = 0; i < PW_MAX; i++) {
+        if (i < bullets) {
+            pw_bullet[i].SetPosition(start_x + i * (pw_d + pw_gap), y, 4);
+            pw_bullet[i].SetOpacity(1);
+        } else {
+            pw_bullet[i].SetOpacity(0);
+        }
+    }
+}
+
+fun DisplayNormalCallback() {
+    global.in_password = 0;
+    pw_prompt.SetOpacity(0);
+    for (i = 0; i < PW_MAX; i++) { pw_bullet[i].SetOpacity(0); }
+    trk_l.SetOpacity(1); trk_c.SetOpacity(1); trk_r.SetOpacity(1);
+    // fill sprites come back on the next ProgressCallback tick
+}
+
 Plymouth.SetBootProgressFunction(ProgressCallback);
 Plymouth.SetRefreshFunction(RefreshCallback);
+Plymouth.SetDisplayPasswordFunction(DisplayPasswordCallback);
+Plymouth.SetDisplayNormalFunction(DisplayNormalCallback);
 
 } // end boot-only splash — shutdown/reboot show just the dark background
