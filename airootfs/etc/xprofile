@@ -9,6 +9,19 @@ export XDG_SESSION_DESKTOP=xfce
 export XDG_CURRENT_DESKTOP=XFCE
 export DESKTOP_SESSION=xfce
 
+# Keybindings and autostart entries spawn skel tools (machud, machud-kbd-watch)
+# by bare name. The live ISO gets ~/.local/bin on PATH from zsh's .zshenv, but
+# SDDM's Xsession never runs zsh startup files — add it here for installed
+# systems or every XF86 media key pops "No such file or directory".
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
 # Optional per-machine display setup (resolution, scaling). Create this script to
 # run xrandr etc.; nothing is hardcoded so the image stays hardware-agnostic.
 [ -x "$HOME/.config/devos/display.sh" ] && "$HOME/.config/devos/display.sh"
+
+# Per-machine panel setup: weather location from the installed timezone + dynamic
+# netload interface (runs before the panel starts so the panel picks it up).
+[ -x "$HOME/.config/devos/panel-dynamic.sh" ] && "$HOME/.config/devos/panel-dynamic.sh"

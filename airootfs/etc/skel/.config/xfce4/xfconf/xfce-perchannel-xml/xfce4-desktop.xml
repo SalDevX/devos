@@ -4,9 +4,15 @@
   <property name="last-settings-migration-version" type="uint" value="1"/>
   <property name="backdrop" type="empty">
     <property name="screen0" type="empty">
+      <!-- Per-monitor backdrop fallbacks for common connector names. The real
+           default is applied at session start by ~/.config/devos/display.sh,
+           which detects the connected output(s) at runtime and sets the
+           wallpaper for whatever name they enumerate under (eDP1 / eDP-1 /
+           eDP-1-1, ...). These static nodes only matter if that hook can't run;
+           never depend on a specific connector name being present here. -->
       <property name="monitoreDP-1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/home/user/Media/Images/Wallpaper-Bank/wallpapers/flower-of-life_space_calm2.png"/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/devos/boliviainteligente-37WxvlfW3to-unsplash.jpg"/>
           <property name="rgba1" type="array">
             <value type="double" value="0.98431372549019602"/>
             <value type="double" value="0.94509803921568625"/>
@@ -14,25 +20,12 @@
             <value type="double" value="1"/>
           </property>
           <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="0"/>
-        </property>
-      </property>
-      <property name="monitorDP-2" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value=""/>
-          <property name="rgba1" type="array">
-            <value type="double" value="0.98431372549019602"/>
-            <value type="double" value="0.94509803921568625"/>
-            <value type="double" value="0.7803921568627451"/>
-            <value type="double" value="1"/>
-          </property>
-          <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
         </property>
       </property>
       <property name="monitoreDP1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value=""/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/devos/boliviainteligente-37WxvlfW3to-unsplash.jpg"/>
           <property name="rgba1" type="array">
             <value type="double" value="0.98431372549019602"/>
             <value type="double" value="0.94509803921568625"/>
@@ -40,12 +33,25 @@
             <value type="double" value="1"/>
           </property>
           <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
+        </property>
+      </property>
+      <property name="monitorDP-2" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="last-image" type="string" value="/usr/share/backgrounds/devos/boliviainteligente-37WxvlfW3to-unsplash.jpg"/>
+          <property name="rgba1" type="array">
+            <value type="double" value="0.98431372549019602"/>
+            <value type="double" value="0.94509803921568625"/>
+            <value type="double" value="0.7803921568627451"/>
+            <value type="double" value="1"/>
+          </property>
+          <property name="color-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
         </property>
       </property>
       <property name="monitorDP2" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value=""/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/devos/boliviainteligente-37WxvlfW3to-unsplash.jpg"/>
           <property name="rgba1" type="array">
             <value type="double" value="0.98431372549019602"/>
             <value type="double" value="0.94509803921568625"/>
@@ -53,12 +59,12 @@
             <value type="double" value="1"/>
           </property>
           <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
         </property>
       </property>
       <property name="monitorDP1" type="empty">
         <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value=""/>
+          <property name="last-image" type="string" value="/usr/share/backgrounds/devos/boliviainteligente-37WxvlfW3to-unsplash.jpg"/>
           <property name="rgba1" type="array">
             <value type="double" value="0.98431372549019602"/>
             <value type="double" value="0.94509803921568625"/>
@@ -66,7 +72,7 @@
             <value type="double" value="1"/>
           </property>
           <property name="color-style" type="int" value="0"/>
-          <property name="image-style" type="int" value="0"/>
+          <property name="image-style" type="int" value="5"/>
         </property>
       </property>
     </property>

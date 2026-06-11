@@ -32,6 +32,13 @@
       <property name="&lt;Alt&gt;&lt;Super&gt;s" type="empty"/>
     </property>
     <property name="custom" type="empty">
+      <property name="XF86AudioRaiseVolume" type="string" value="machud volume up"/>
+      <property name="XF86AudioLowerVolume" type="string" value="machud volume down"/>
+      <property name="XF86AudioMute" type="string" value="machud volume mute"/>
+      <property name="XF86MonBrightnessUp" type="string" value="machud brightness up"/>
+      <property name="XF86MonBrightnessDown" type="string" value="machud brightness down"/>
+      <property name="XF86KbdBrightnessUp" type="string" value="machud keyboard up"/>
+      <property name="XF86KbdBrightnessDown" type="string" value="machud keyboard down"/>
       <property name="&lt;Alt&gt;F2" type="string" value="xfce4-appfinder --collapsed">
         <property name="startup-notify" type="bool" value="true"/>
       </property>

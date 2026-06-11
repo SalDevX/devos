@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Watch the keyboard-backlight level and fire the macOS HUD when it changes.
+# Needed because the MacBook kbd-backlight key is handled by the kernel and
+# never reaches X, so there's no keysym to bind.
+#
+# Exits cleanly on non-MacBook hardware (no smc::kbd_backlight LED), so it is
+# safe to autostart in every session.
+f=/sys/class/leds/smc::kbd_backlight/brightness
+MACHUD=machud   # resolved on PATH ($HOME/.local/bin is on the session PATH via .zshenv)
+[[ -r "$f" ]] || exit 1
+last=$(cat "$f" 2>/dev/null)
+while :; do
+    cur=$(cat "$f" 2>/dev/null)
+    if [[ -n "$cur" && "$cur" != "$last" ]]; then
+        last="$cur"
+        "$MACHUD" keyboard show >/dev/null 2>&1
+    fi
+    sleep 0.2
+done

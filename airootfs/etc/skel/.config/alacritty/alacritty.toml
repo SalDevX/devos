@@ -13,44 +13,16 @@ dynamic_padding = true
 history = 100000  # keep large history for reading logs
 multiplier = 3    # faster scroll per wheel notch
 
-[colors.primary]
-background = "#141516"
-foreground = "#C8CACC"
-
-[colors.cursor]
-text = "#141516"
-cursor = "#00FF99"
-
-[colors.selection]
-text = "CellForeground"
-background = "#404040"
-
-# === Accented log-level colors ===
-[colors.normal]
-black = "#1E1E1E"
-red = "#FF5F5F"      # errors
-green = "#5FFF87"    # success
-yellow = "#FFD75F"   # warnings
-blue = "#5FAFFF"     # info
-magenta = "#AF87FF"
-cyan = "#5FD7D7"
-white = "#C0C0C0"
-
-[colors.bright]
-black = "#4E4E4E"
-red = "#FF8787"
-green = "#87FFAF"
-yellow = "#FFFF87"
-blue = "#87D7FF"
-magenta = "#D7AFFF"
-cyan = "#87FFFF"
-white = "#FFFFFF"
+# === Theme ===
+# Colors live in ~/.config/alacritty/themes/*.toml.
+# Switch theme by changing the filename below: mocha | macchiato | frappe | latte
+[general]
+import = ["~/.config/alacritty/themes/mocha.toml"]
 
 [font]
-normal = { family = "Menlo", style = "Regular" }
-bold = { family = "Menlo", style = "Bold" }
-italic = { family = "Menlo", style = "Italic" }
-bold_italic = { family = "Menlo", style = "Bold Italic" }
+# Only the normal family is set; Alacritty auto-derives bold / italic /
+# bold-italic from it (equivalent to kitty's bold_font/italic_font auto).
+normal = { family = "Menlo" }
 
 # Comfortable size for reading + small extra spacing for clarity
 size = 10.5
@@ -62,8 +34,10 @@ builtin_box_drawing = true
 save_to_clipboard = true
 
 [cursor]
-style = { shape = "Underline", blinking = "off" }
-blink_interval = 1000
+# "Always" forces blinking even when zsh/tmux request a steady cursor.
+style = { shape = "Underline", blinking = "Always" }
+blink_interval = 500    # ms per blink (lower = faster)
+blink_timeout = 0       # 0 = never stop blinking (default 5s stops when idle)
 unfocused_hollow = true
 
 [hints]

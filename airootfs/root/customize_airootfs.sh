@@ -34,6 +34,17 @@ ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 # first login. Root login is LOCKED (use sudo).
 # ----------------------------------------------------------------------
 chown -R root:root /etc/skel
+# mkarchiso copies airootfs with cp --no-preserve=mode (mkarchiso:316), so every
+# exec bit under /etc/skel is LOST at build. Restore them BEFORE useradd -m
+# clones skel into /home/user: keybindings spawn machud by name (a 0644 copy
+# gives "Permission denied"), and .xinitrc//etc/xprofile gate display.sh/
+# panel-dynamic.sh behind [ -x ] so they silently never run without this.
+chmod 0755 /etc/skel/.local/bin/* \
+           /etc/skel/.config/devos/*.sh \
+           /etc/skel/.config/xfce4/xfdashboard-startup.sh
+find /etc/skel/.tmux -type f \( -name '*.sh' -o -name '*.tmux' -o -name '*.exp' \) \
+     -exec chmod 0755 {} + 2>/dev/null || true
+find /etc/skel/.config/rofi -type f -name '*.sh' -exec chmod 0755 {} + 2>/dev/null || true
 useradd -m -s /usr/bin/zsh user 2>/dev/null || true
 for g in wheel audio video input render; do   # docker + realtime dropped (see README / MusicOS)
   groupadd -f "$g"
@@ -72,6 +83,16 @@ for svc in NetworkManager systemd-resolved systemd-timesyncd \
   systemctl enable "$svc" >/dev/null 2>&1 || true
 done
 
+# Broadcom Mac Wi-Fi firmware stager — lands the (non-redistributable) BCM4364/4377
+# firmware from a baked airootfs slot or a FAT USB/EFI BEFORE the driver loads, so
+# Wi-Fi works in the live "try it" session. No-op when firmware is already present.
+systemctl enable devos-wifi-firmware.service >/dev/null 2>&1 || true
+
+# Broadcom Wi-Fi driver auto-select — runs before NetworkManager on the live ISO
+# and the installed system so wl (BCM4360) and brcmfmac (BCM4364 / BCM4377) never
+# fight for the card. Hardware-agnostic: the helper no-ops on non-Broadcom machines.
+systemctl enable devos-wifi-driver.service >/dev/null 2>&1 || true
+
 # Touchpad / Magic-Trackpad gestures for every user (survives reboots).
 systemctl --global enable libinput-gestures.service >/dev/null 2>&1 || true
 
@@ -98,6 +119,31 @@ systemctl enable devos-firstboot.service >/dev/null 2>&1 || true
 
 # Make devos-calamares wrapper executable (archiso does not auto-chmod binaries).
 chmod 0755 /usr/local/bin/devos-calamares
+
+# ----------------------------------------------------------------------
+# SDDM login wallpaper (per-machine, mutable). The greeter runs as the
+# unprivileged `sddm` user and can't read /home, so it reads its background from
+# /var/lib/devos/sddm-wallpaper.jpg. Make that dir wheel-writable (setgid) +
+# world-readable so the XFCE session helper (devos-sddm-wallpaper-sync) can
+# mirror the user's chosen wallpaper into it with NO root/polkit, while sddm can
+# still read it. Ships defaulted to the greeter's bundled image; devossetup /
+# install.sh re-assert these perms on the installed target.
+# ----------------------------------------------------------------------
+install -d -m 2775 /var/lib/devos
+chgrp wheel /var/lib/devos
+chmod 2775 /var/lib/devos
+if [ -f /var/lib/devos/sddm-wallpaper.jpg ]; then
+  chgrp wheel /var/lib/devos/sddm-wallpaper.jpg
+  chmod 0664 /var/lib/devos/sddm-wallpaper.jpg
+fi
+# Per-user login avatars: devos-sddm-avatar-sync publishes ~/.face here as
+# <user>.face.icon and SDDM's FacesDir points at it. Same wheel-writable
+# (setgid) + world-readable scheme as the wallpaper dir above.
+install -d -m 2775 /var/lib/devos/faces
+chgrp wheel /var/lib/devos/faces
+chmod 2775 /var/lib/devos/faces
+chmod 0755 /usr/local/bin/devos-sddm-wallpaper-sync
+chmod 0755 /usr/local/bin/devos-sddm-avatar-sync
 
 # ----------------------------------------------------------------------
 # Live ISO: Install DevOS desktop shortcut for the live user only.

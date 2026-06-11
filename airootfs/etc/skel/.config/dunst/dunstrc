@@ -1,146 +1,396 @@
 [global]
+
+    # Monitor index where notifications appear.
+    # 0 = first monitor.
+    # Ignored if 'follow' is mouse or keyboard.
     monitor = 0
+
+    # Notification placement behavior:
+    # mouse     = follow cursor monitor
+    # keyboard  = follow focused window monitor
+    # none      = always use monitor setting above
     follow = none
+
+    # Dynamic width:
+    # min width = 0px
+    # max width = 300px
+    # Notification grows only as needed.
     width = (0, 300)
+
+    # Dynamic height:
+    # notification can grow up to 300px tall.
     height = (0, 300)
+
+    # Position notifications at bottom center of screen.
     origin = bottom-center
+
+    # Move notification stack upward by 50px from bottom edge.
     offset = (0, 50)
+
+    # HiDPI scaling.
+    # 0 = auto-detect DPI scaling.
     scale = 0
+
+    # Only one notification visible at a time.
+    # Additional notifications are queued.
     notification_limit = 1
+
+    # Draw progress bars when notifications provide
+    # an integer progress hint (volume, brightness, etc.).
     progress_bar = true
+
+    # Progress bar total height.
     progress_bar_height = 12
+
+    # No outline/frame around progress bar.
     progress_bar_frame_width = 0
+
+    # Minimum progress bar width.
     progress_bar_min_width = 150
+
+    # Maximum progress bar width.
     progress_bar_max_width = 300
+
+    # Rounded progress bar corners.
     progress_bar_corner_radius = 6
+
+    # Round all progress bar corners.
     progress_bar_corners = all
+
+    # Don't show "N hidden notifications" indicator.
     indicate_hidden = no
+
+    # Slight transparency.
+    # Lower values = more opaque.
     transparency = 5
+
+    # Thickness of separator between notifications.
     separator_height = 2
+
+    # Inner padding around notification contents.
     padding = 8
+
+    # Left/right padding.
     horizontal_padding = 8
+
+    # Space between icon and text.
     text_icon_padding = 0
+
+    # No outer frame/border.
     frame_width = 0
-    frame_color = "#89b4fa"
-    highlight = "#00FF8036"
+
+    # Frame color (unused because frame width is 0).
+    # frame_color = "#89b4fa"
+
+    # Progress bar highlight color.
+    # highlight = "#00a6ff62"
+
+    # Space between stacked notifications.
+    # With notification_limit=1 this is effectively irrelevant.
     gap_size = 0
+
+    # Separator inherits frame color.
     separator_color = frame
+
+    # Sort notifications by urgency and age.
     sort = yes
+
+    # Main notification font.
     font = Noto Sans 11
+
+    # Auto line height.
     line_height = 0
+
+    # Allow full Pango markup:
+    # <b>, <i>, spans, colors, etc.
     markup = full
+
+    # Notification text layout:
+    # %s = summary/title
+    # %b = body
+    # %p = progress percentage
     format = "<b>%s</b>\n%b\n%p"
+
+    # Center text horizontally.
     alignment = center
+
+    # Center content vertically.
     vertical_alignment = center
+
+    # Show timestamp age after 60 seconds.
     show_age_threshold = 60
+
+    # Truncate long text in the middle:
+    # example:
+    # /home/.../important-file.txt
     ellipsize = middle
+
+    # Preserve line breaks from sender.
     ignore_newline = no
+
+    # Merge duplicate notifications.
     stack_duplicates = true
+
+    # Hide "(x3)" duplicate counter.
     hide_duplicate_count = true
+
+    # Show icons/markers for state information.
     show_indicators = yes
-    enable_recursive_icon_lookup = false
-    icon_theme = Gruvbox-Plus-Dark, Papirus, Adwaita, hicolor, WhiteSur-dark
+
+    # Search icon themes recursively.
+    enable_recursive_icon_lookup = true
+
+    # Optional icon themes.
+    #icon_theme = Gruvbox-Plus-Dark, Papirus, Adwaita, hicolor, WhiteSur-dark
+
+    # Icon displayed left of text.
     icon_position = left
+
+    # Smallest icon size.
     min_icon_size = 32
+
+    # Largest icon size.
     max_icon_size = 128
-    icon_path = /usr/share/icons/Gruvbox-Plus-Dark:/usr/share/icons/Papirus:/usr/share/icons/hicolor:/usr/share/pixmaps
+
+    # Optional custom icon search path.
+    #icon_path = ...
+
+    # Keep dismissed notifications in history.
     sticky_history = yes
+
+    # Store last 20 notifications.
     history_length = 20
+
+    # Launcher used for Dunst history/menu actions.
     dmenu = /usr/bin/dmenu -p dunst:
+
+    # Browser used when opening URLs.
     browser = /usr/bin/xdg-open
+
+    # Run attached scripts even when notification is suppressed.
     always_run_script = true
+
+    # WM_CLASS title.
     title = Dunst
+
+    # WM_CLASS class name.
     class = Dunst
+
+    # Rounded notification window corners.
     corner_radius = 15
+
+    # Round all notification corners.
     corners = all
+
+    # Respect applications requesting close via DBus.
     ignore_dbusclose = false
+
+    # Native Wayland rendering preferred.
+    # false = don't force XWayland.
     force_xwayland = false
+
+    # Multi-monitor compatibility option (mostly X11).
     force_xinerama = false
+
+    # Mouse interactions:
     mouse_left_click = close_current
     mouse_middle_click = do_action, close_current
     mouse_right_click = close_all
+
 [experimental]
+
+    # Scale notifications correctly on monitors
+    # with different DPI values.
     per_monitor_dpi = true
+
+
+# ---------------------------------------------------------
+# Custom notification rules
+# ---------------------------------------------------------
+
 [volume_notify]
-appname = "volume"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Match notifications whose appname is "volume".
+    appname = "volume"
+
+    # Show body only.
+    format = "%b"
+
+    # Icon above text.
+    icon_position = top
+
+    # Semi-transparent dark background.
+    background = "#2b2b2be6"
+
+    foreground = "#f5f5f5"
+
+    # Display for 1 second.
+    timeout = 1000
+
+
 [xfce_volume_notify]
-appname = "Xfce volume control"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 555
+
+    # Match XFCE's built-in volume popup.
+    appname = "Xfce volume control"
+
+    # Suppress XFCE popup entirely.
+    skip_display = true
+
+    # Dummy format.
+    format = " "
+
+    icon_position = top
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 555
+
+
 [xfce_brightness_notify]
-appname = "xfce4-power-manager"
-icon = ".*display-brightness.*"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Match XFCE brightness notifications.
+    appname = "xfce4-power-manager"
+
+    # Only brightness-related messages.
+    body = "*Brightness*"
+
+    # Hide original popup.
+    skip_display = true
+
+    format = " "
+    icon_position = top
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 1000
+
+
 [xfce_kbd_brightness_notify]
-appname = "xfce4-power-manager"
-icon = ".*keyboard-brightness.*"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Same idea for keyboard backlight brightness.
+    appname = "xfce4-power-manager"
+    body = "*Brightness*"
+
+    skip_display = true
+
+    format = " "
+    icon_position = top
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 1000
+
+
 [xfce_power_manager_fallback]
-appname = "xfce4-power-manager"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Catch-all rule for remaining xfce4-power-manager messages.
+    appname = "xfce4-power-manager"
+
+    format = " "
+    icon_position = top
+    background = "#fafafa32"
+    foreground = "#757575"
+    timeout = 1000
+
+
 [keyboard_backlight_notify]
-appname = "kbd-brightness"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Custom keyboard backlight notification source.
+    appname = "kbd-brightness"
+
+    format = "%b"
+    icon_position = top
+
+    background = "#e6e6e6e6"
+    foreground = "#1a1a1a"
+
+    timeout = 1000
+
+
 [brightness_notify]
-appname = "brightness"
-format = " "
-icon_position = top
-background = "#fafafa32"
-foreground = "#757575"
-timeout = 1000
+
+    # Custom brightness notification source.
+    appname = "brightness"
+
+    format = "%b"
+    icon_position = top
+
+    background = "#e6e6e6e6"
+    foreground = "#1a1a1a"
+
+    timeout = 1000
+
+
+# ---------------------------------------------------------
+# Urgency levels
+# ---------------------------------------------------------
+
 [urgency_low]
+
     background = "#fafafa32"
     foreground = "#757575"
+
+    # 1 second timeout.
     timeout = 1
+
+
 [urgency_normal]
+
     background = "#fafafa32"
     foreground = "#757575"
+
     timeout = 1
+
+    # Can override pause state up to level 30.
     override_pause_level = 30
+
     default_icon = dialog-information
+
+
 [urgency_critical]
+
     background = "#352B41"
     foreground = "#ffffff"
+
     frame_color = "#550A35"
+
+    # Never expire automatically.
     timeout = 0
+
     override_pause_level = 60
+
     default_icon = dialog-warning
+
+
+# ---------------------------------------------------------
+# Workspace switch notifications
+# ---------------------------------------------------------
+
 [workspace]
-appname = Workspace
-timeout = 1
-background = "#fafafa32"
-foreground = "#757575"
-match_transient = yes
-set_transient = yes
-stack_tag = "workspace"
-    match_transient = yes
-   set_transient = yes
-  set_stack_tag = "volume"
- 
+
+    # Match titles beginning with "Space"
+    # (e.g. Space 1, Space 2).
+    summary = "Space*"
+
+  
+    icon_position = top
+
+    # Replace previous workspace notification
+    # instead of stacking new ones.
+    set_stack_tag = "workspace"
+
+    
+
+
+    # Treat as transient notification.
+    set_transient = yes
+
+    timeout = 1
+
+    background = "#fafafa32"
+    foreground = "#757575"
+
+
+
+
+
 
 
 

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DevOS login wallpaper sync
+Comment=Mirror the desktop wallpaper to the SDDM login screen
+Exec=devos-sddm-wallpaper-sync
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

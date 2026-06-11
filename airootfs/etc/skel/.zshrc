@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # ────────────── ~/.zshrc ──────────────
 # Interactive shells only.
 # .zshenv has already loaded — PATH and env vars are set.
@@ -7,6 +14,8 @@
 if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+
 
 # ────────────── HISTORY ──────────────
 HISTFILE="$HOME/.zsh_history"
@@ -23,6 +32,7 @@ setopt PUSHD_IGNORE_DUPS      # no duplicates in stack
 setopt PUSHD_SILENT           # don't print stack on cd
 
 # ────────────── COMPLETION ──────────────
+fpath=(~/.zsh/completions $fpath)   # user completion functions (must precede compinit)
 autoload -Uz compinit
 compinit -d "${XDG_CACHE_HOME}/zcompdump-${ZSH_VERSION}"
 
@@ -35,6 +45,8 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 # Install: sudo pacman -S zsh-autosuggestions zsh-syntax-highlighting zsh-theme-powerlevel10k
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# history-substring-search MUST be sourced after syntax-highlighting
+source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # ────────────── PROMPT ──────────────
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
@@ -67,8 +79,11 @@ ZSH_HIGHLIGHT_STYLES[default]="fg=#bdae93"
 # ────────────── KEYBINDINGS ──────────────
 bindkey -e                         # emacs mode (default)
 bindkey '^R' history-incremental-search-backward
-bindkey '^[[A' history-search-backward   # up arrow: history search
-bindkey '^[[B' history-search-forward    # down arrow: history search
+# Up/Down: substring search — cycles commands CONTAINING the typed text
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey "$terminfo[kcuu1]" history-substring-search-up     # app-mode cursor keys
+bindkey "$terminfo[kcud1]" history-substring-search-down
 
 # Word navigation — Ctrl+arrow and Alt/Option+arrow
 bindkey '^[[1;5D' backward-word
@@ -117,6 +132,11 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -- -='cd -'          # go back to previous dir
+alias _='sudo'
+alias xx='exit'
+alias k_ssh='kitten ssh'
+alias cat='bat --paging=never --style=plain'
+
 
 # ────────────── ALIASES — Zsh ──────────────
 alias zshconfig="nvim ~/.zshrc"
@@ -129,6 +149,7 @@ alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # ────────────── ALIASES — System ──────────────
 alias neo='neofetch | lolcat'
+alias neoless='neofetch --off'
 alias blame='systemd-analyze blame'
 alias ccache='sudo /usr/local/bin/clean_caches'
 
@@ -143,7 +164,6 @@ alias pulseon='pulseaudio --start'
 alias stop-pulse="systemctl --user stop pulseaudio.service pulseaudio.socket"
 alias jackpulse='pactl load-module module-jack-sink; pactl load-module module-jack-source'
 alias boosteq='/home/user/audio-scripts/structured-project-eq-plus/build/guitar_eq_plus-ui'
-alias super='/home/user/.local/bin/toggle-reaper-mode.sh'
 
 # ────────────── ALIASES — Network & Security ──────────────
 alias Networking='sudo systemctl start NetworkManager.service firewalld.service'
@@ -218,5 +238,8 @@ latest() {
         echo "$timestamp | $size_h | $path"
       done
 }
+
+
+
 
 # ────────────── STARTUP MESSAGE ──────────────

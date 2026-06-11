@@ -21,6 +21,7 @@
     <property name="RGBA" type="string" value="bgr"/>
   </property>
   <property name="Gtk" type="empty">
+    <property name="Modules" type="string" value="appmenu-gtk-module"/>
     <property name="CanChangeAccels" type="bool" value="true"/>
     <property name="ColorPalette" type="empty"/>
     <property name="FontName" type="string" value="Noto Sans 10"/>
@@ -38,7 +39,7 @@
     <property name="ToolbarStyle" type="empty"/>
     <property name="ToolbarIconSize" type="empty"/>
     <property name="ShellShowsMenubar" type="bool" value="true"/>
-    <property name="ShellShowsAppmenu" type="bool" value="false"/>
+    <property name="ShellShowsAppmenu" type="bool" value="true"/>
   </property>
   <property name="Gdk" type="empty">
     <property name="WindowScalingFactor" type="int" value="1"/>

@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+#
+# push-terminfo — install local terminfo entries on remote hosts over SSH.
+#
+# Why: Alacritty (TERM=alacritty) has no `kitten ssh` to auto-ship its terminfo,
+# so remote hosts that lack the `alacritty` entry glitch on arrow/word/history
+# navigation — both at the bare shell and inside tmux (which also needs
+# `tmux-256color`). This pushes both entries into the remote user's
+# ~/.terminfo, which needs no root and overrides nothing system-wide.
+#
+# Usage:
+#   push-terminfo host1 [host2 ...]        # explicit hosts (user@host ok)
+#   push-terminfo -F hosts.txt             # one host per line (# comments ok)
+#   push-terminfo --ssh-config             # all concrete Host entries in ~/.ssh/config
+#   echo host | push-terminfo -            # read hosts from stdin
+#
+# Options:
+#   -t, --terms "a b"   terminfo entries to push (default: "alacritty tmux-256color")
+#   -n, --dry-run       show what would happen, make no changes
+#   -F, --file FILE     read hosts from FILE (one per line, # comments ok)
+#   -f, --force         reinstall even if the remote already has the entries
+#       --ssh-config    use hosts from ~/.ssh/config
+#   -h, --help          this help
+#
+set -uo pipefail
+
+TERMS=(alacritty tmux-256color)
+DRY=0
+FORCE=0
+declare -a HOSTS=()
+
+die() { printf 'error: %s\n' "$*" >&2; exit 1; }
+usage() { sed -n '2,/^set /{/^set /d;s/^# \{0,1\}//;p}' "$0"; exit "${1:-0}"; }
+
+# ---- parse args -------------------------------------------------------------
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help)       usage 0 ;;
+    -n|--dry-run)    DRY=1; shift ;;
+    -f|--force)      FORCE=1; shift ;;
+    -t|--terms)      [ $# -ge 2 ] || die "--terms needs an argument"
+                     # shellcheck disable=SC2206
+                     TERMS=($2); shift 2 ;;
+    --ssh-config)    while read -r h; do HOSTS+=("$h"); done < <(
+                       grep -iE '^[[:space:]]*Host[[:space:]]+' ~/.ssh/config 2>/dev/null \
+                         | awk '{for(i=2;i<=NF;i++) print $i}' | grep -vE '[*?]')
+                     shift ;;
+    -F|--file)       [ $# -ge 2 ] || die "--file needs an argument"
+                     while read -r h; do
+                       h="${h%%#*}"; h="$(echo "$h" | xargs)"
+                       [ -n "$h" ] && HOSTS+=("$h")
+                     done < "$2"; shift 2 ;;
+    -)               while read -r h; do
+                       h="${h%%#*}"; h="$(echo "$h" | xargs)"
+                       [ -n "$h" ] && HOSTS+=("$h")
+                     done; shift ;;
+    --)              shift; while [ $# -gt 0 ]; do HOSTS+=("$1"); shift; done ;;
+    -*)              die "unknown option: $1 (try --help)" ;;
+    *)               HOSTS+=("$1"); shift ;;
+  esac
+done
+
+[ "${#HOSTS[@]}" -gt 0 ] || { echo "no hosts given"; usage 1; }
+
+# ---- build the terminfo source payload once, locally -----------------------
+PAYLOAD=""
+PUSH_TERMS=()
+for t in "${TERMS[@]}"; do
+  if src=$(infocmp -x "$t" 2>/dev/null); then
+    PAYLOAD+="$src"$'\n\n'
+    PUSH_TERMS+=("$t")
+  else
+    printf 'warn: local terminfo entry %q not found — skipping it\n' "$t" >&2
+  fi
+done
+[ "${#PUSH_TERMS[@]}" -gt 0 ] || die "none of the requested terminfo entries exist locally"
+
+echo "Entries to push: ${PUSH_TERMS[*]}"
+echo "Target hosts:    ${HOSTS[*]}"
+[ "$DRY" -eq 1 ] && echo "(dry-run — no changes will be made)"
+echo
+
+SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=8 -o StrictHostKeyChecking=accept-new)
+
+ok=0; skip=0; fail=0
+for host in "${HOSTS[@]}"; do
+  printf '== %s ==\n' "$host"
+
+  # idempotency check: does the remote already have every requested entry?
+  if [ "$FORCE" -eq 0 ]; then
+    check=$(printf '%s ' "${PUSH_TERMS[@]}")
+    if ssh "${SSH_OPTS[@]}" "$host" "for t in $check; do infocmp \$t >/dev/null 2>&1 || exit 1; done" 2>/dev/null; then
+      echo "   already present — skipping (use --force to reinstall)"
+      skip=$((skip+1)); echo; continue
+    fi
+  fi
+
+  if [ "$DRY" -eq 1 ]; then
+    echo "   would install: ${PUSH_TERMS[*]}"
+    ok=$((ok+1)); echo; continue
+  fi
+
+  if printf '%s' "$PAYLOAD" | ssh "${SSH_OPTS[@]}" "$host" \
+       'mkdir -p ~/.terminfo && tic -x -o ~/.terminfo /dev/stdin' 2>/tmp/pti.$$; then
+    echo "   installed: ${PUSH_TERMS[*]}"
+    ok=$((ok+1))
+  else
+    echo "   FAILED:"; sed 's/^/     /' /tmp/pti.$$ >&2
+    fail=$((fail+1))
+  fi
+  rm -f /tmp/pti.$$
+  echo
+done
+
+printf 'Done. installed/queued: %d   skipped: %d   failed: %d\n' "$ok" "$skip" "$fail"
+[ "$fail" -eq 0 ]

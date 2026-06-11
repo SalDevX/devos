@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=machud keyboard-backlight HUD watcher
+Comment=Shows the macOS-style HUD when the keyboard backlight changes
+Exec=machud-kbd-watch
+X-XFCE-Autostart-enabled=true
+NoDisplay=true
+Terminal=false

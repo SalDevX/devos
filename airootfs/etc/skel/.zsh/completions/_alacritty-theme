@@ -1,0 +1,5 @@
+#compdef alacritty-theme
+# Completes theme names from ~/.config/alacritty/themes/*.toml
+local -a themes
+themes=( ${HOME}/.config/alacritty/themes/*.toml(N:t:r) )
+_describe -t themes 'alacritty theme' themes

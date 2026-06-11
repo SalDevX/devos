@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DevOS login avatar sync
+Comment=Publish the user's account picture to the SDDM login screen
+Exec=devos-sddm-avatar-sync
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

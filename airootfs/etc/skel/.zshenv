@@ -45,7 +45,9 @@ export LADSPA_PATH="/usr/lib/ladspa"
 
 # ── Misc ──
 export XAUTHORITY="$HOME/.Xauthority"
-export REGISTRATION_CODE="unixlike"
+# Personal values (registration codes, tokens) belong in ~/.zshenv.secret
+# (sourced below if present, never shipped) — not here.
 
 # ── Secrets (gitignored) ──
 [[ -f "$HOME/.zshenv.secret" ]] && source "$HOME/.zshenv.secret"
+export FREETYPE_PROPERTIES="truetype:interpreter-version=40 autofitter:no-stem-darkening=0 cff:no-stem-darkening=0"
