@@ -41,9 +41,9 @@ def _wordmark(target_width):
         else ImageFont.load_default()
     tmp = Image.new("RGBA", (target_width, size * 2), (0, 0, 0, 0))
     d = ImageDraw.Draw(tmp)
-    box = d.textbbox((0, 0), "DevOS", font=font)
+    box = d.textbbox((0, 0), "devOS", font=font)
     img = Image.new("RGBA", (box[2] - box[0], box[3] - box[1]), (0, 0, 0, 0))
-    ImageDraw.Draw(img).text((-box[0], -box[1]), "DevOS",
+    ImageDraw.Draw(img).text((-box[0], -box[1]), "devOS",
                              font=font, fill=FG + (230,))
     return img
 

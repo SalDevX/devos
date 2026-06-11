@@ -51,6 +51,7 @@ Boot the ISO. Click through the installer. Reboot into a fully configured XFCE d
 | **Terminal** | Alacritty → tmux → zsh with Powerlevel10k |
 | **Login** | TTY autologin → startx → XFCE (no display manager) |
 | **Gestures** | libinput-gestures: 4-finger swipe-up = overview, 3-finger = workspace switch |
+| **Media keys** | machud — macOS-style frosted volume / display-brightness / keyboard-backlight HUD on dunst |
 
 ---
 
@@ -116,7 +117,8 @@ DevOS ships with full Apple MacBook hardware support out of the box. No post-ins
 | Intel Iris Pro / HD Graphics | `xf86-video-intel` · TearFree · DRI3 | ✅ |
 | Magic Trackpad 2 | `hid-magicmouse` DKMS · libinput pressure curves | ✅ |
 | Magic Mouse 2 | `hid-magicmouse` DKMS · udev acceleration | ✅ |
-| FaceTime HD Camera | `facetimehd` DKMS | ✅ |
+| Trackpad palm rejection | disable-touchpad-while-typing on by default (`bcm5974`) | ✅ |
+| FaceTime HD Camera | `facetimehd` DKMS + firmware · `cam-control` GUI · on-demand toggle | ✅ |
 | Thunderbolt 2 | Native kernel support | ✅ |
 | Fan control | `mbpfan` service | ✅ |
 | Built-in Display Audio | Disabled at boot (prevents HDMI conflicts) | ✅ |

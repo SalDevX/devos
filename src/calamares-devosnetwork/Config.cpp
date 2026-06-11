@@ -106,9 +106,14 @@ Config::setConnectTimeoutMs( int ms )
 bool
 Config::isComplete() const
 {
-    // Wired up, Wi-Fi connected, or the user chose Skip — any of these unblocks
-    // Next. Skip is the guarantee that offline / wired installs never stall here.
-    return m_state == Skipped || m_state == Connected || m_ethernetConnected;
+    // ALWAYS true. DevOS installs fully OFFLINE — copyairootfs rsync-clones the
+    // squashfs, no module ever needs the network — so this page is pure
+    // convenience and must never gate the installer. Forcing Next enabled from the
+    // start means a machine that physically can't get Wi-Fi (e.g. a 2017 MacBook
+    // whose BCM4364 firmware isn't present) can never be trapped here: the user
+    // connects if they want, otherwise just presses Next. (Skip still works and is
+    // kept for clarity, but Next no longer depends on it.)
+    return true;
 }
 
 void

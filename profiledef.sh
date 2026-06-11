@@ -24,6 +24,12 @@ file_permissions=(
   ["/root/customize_airootfs.sh"]="0:0:755"
   ["/usr/local/bin"]="0:0:755"
   ["/usr/local/bin/devos-calamares"]="0:0:755"
+  ["/usr/local/bin/devos-sddm-wallpaper-sync"]="0:0:755"
+  ["/usr/local/bin/devos-sddm-avatar-sync"]="0:0:755"
+  ["/usr/local/bin/devos-wifi-driver"]="0:0:755"
+  ["/usr/local/bin/devos-wifi-firmware"]="0:0:755"
+  ["/usr/local/bin/devos-brcmfmac-load"]="0:0:755"
+  ["/usr/local/bin/devos-touchbar-bind"]="0:0:755"
   ["/etc/skel"]="0:0:755"
   ["/etc/sudoers.d/zz-live-user"]="0:0:440"
   # Calamares post-install logic is now native Python job modules under

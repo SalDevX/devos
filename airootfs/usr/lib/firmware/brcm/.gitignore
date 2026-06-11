@@ -1,0 +1,12 @@
+# Apple-extracted Broadcom Wi-Fi firmware is NOT redistributable — keep it out of
+# git. For a PRIVATE build, drop your extracted blobs in THIS folder:
+#     brcmfmac4364b2-pcie.bin   brcmfmac4364b2-pcie.clm_blob   brcmfmac4364b2-pcie.txt
+# (or the 4377*/4378* set for a T2 Mac). mkarchiso bakes them into the squashfs, so
+# Wi-Fi works in the live "try it" session with zero user effort — and they never
+# reach the public repo. To obtain them, see /usr/local/bin/devos-wifi-firmware.
+# That helper also auto-installs firmware staged on a FAT USB / EFI at boot, so you
+# do NOT have to bake them in if you'd rather not ship Apple firmware.
+brcmfmac*
+*.tar
+*.clm_blob
+!.gitignore
